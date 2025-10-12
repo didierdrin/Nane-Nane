@@ -11,7 +11,7 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false); // Toggle between sign-in and sign-up
+  const [isSignUp, setIsSignUp] = useState(false); 
   const navigate = useNavigate();
   const { toast } = useToast();
 
