@@ -162,7 +162,7 @@ const AdminLogin = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       autoComplete={isSignUp ? "new-password" : "current-password"}
                       required
-                      placeholder="••••••••"
+                      placeholder=""
                       className="pr-10"
                     />
                     <Button
@@ -199,7 +199,7 @@ const AdminLogin = () => {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         autoComplete="new-password"
                         required
-                        placeholder="••••••••"
+                        placeholder=""
                         className="pr-10"
                       />
                       <Button
