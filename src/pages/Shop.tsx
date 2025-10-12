@@ -36,7 +36,7 @@ const Shop = () => {
     <>
       <Navbar />
       <main className=" pb-16">
-        <section className="bg-gradient-to-r from-nanenane-800 to-nanenane-900 text-white py-16 pt-24">
+        <section className="bg-gradient-to-r from-nanenane-900 to-nanenane-900 text-white py-16 pt-24">
           <div className="container-custom">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">Shop Our Products</h1>
             <p className="max-w-2xl text-nanenane-100 text-lg animate-fade-in delay-100">
@@ -84,7 +84,7 @@ const Shop = () => {
 
                   <Separator className="my-6" />
 
-                  <div className="mt-4 p-5 bg-nanenane-50 rounded-lg border border-nanenane-100">
+                  <div className="mt-4 py-5 px-2 bg-nanenane-50 rounded-lg border border-nanenane-100">
                     <h3 className="font-medium text-nanenane-800 mb-2">Need Assistance?</h3>
                     <p className="text-sm text-gray-600 mb-4">
                       Contact our team for custom orders or product inquiries.
