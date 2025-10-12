@@ -1,13 +1,14 @@
-
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Upload, Link as LinkIcon } from "lucide-react";
 
 interface ProductFormImageFieldProps {
   image: string;
   errors: Record<string, string>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileChange: (file: File) => void;
   getRandomImage: (category: string) => string;
   category: string;
   onClearErrors: (field: string) => void;
@@ -17,46 +18,133 @@ const ProductFormImageField = ({
   image, 
   errors, 
   onChange, 
+  onFileChange,
   getRandomImage,
   category,
   onClearErrors
 }: ProductFormImageFieldProps) => {
+  const [uploadMode, setUploadMode] = useState<'url' | 'file'>('file');
+  const [selectedFileName, setSelectedFileName] = useState<string>('');
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+
+      setSelectedFileName(file.name);
+      onFileChange(file);
+      onClearErrors("image");
+    }
+  };
+
   return (
     <div>
       <Label htmlFor="image" className={errors.image ? "text-red-500" : ""}>
-        Image URL *
+        Product Image *
       </Label>
-      <div className="flex gap-2">
-        <Input
-          id="image"
-          name="image"
-          value={image}
-          onChange={onChange}
-          placeholder="https://example.com/image.jpg"
-          className={errors.image ? "border-red-500" : ""}
-        />
-        <Button 
-          type="button" 
-          variant="outline"
-          onClick={() => {
-            const randomImage = getRandomImage(category);
-            // Using a custom event to simulate onChange
-            const syntheticEvent = {
-              target: {
-                name: 'image',
-                value: randomImage
-              }
-            } as React.ChangeEvent<HTMLInputElement>;
-            onChange(syntheticEvent);
-            onClearErrors("image");
-          }}
+      
+      {/* Toggle between file upload and URL */}
+      <div className="flex gap-2 mb-2">
+        <Button
+          type="button"
+          variant={uploadMode === 'file' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setUploadMode('file')}
         >
-          Sample
+          <Upload className="h-4 w-4 mr-2" />
+          Upload File
+        </Button>
+        <Button
+          type="button"
+          variant={uploadMode === 'url' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setUploadMode('url')}
+        >
+          <LinkIcon className="h-4 w-4 mr-2" />
+          Image URL
         </Button>
       </div>
+
+      {uploadMode === 'file' ? (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className={errors.image ? "border-red-500" : ""}
+              />
+              {selectedFileName && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Selected: {selectedFileName}
+                </p>
+              )}
+            </div>
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={() => {
+                const randomImage = getRandomImage(category);
+                const syntheticEvent = {
+                  target: {
+                    name: 'image',
+                    value: randomImage
+                  }
+                } as React.ChangeEvent<HTMLInputElement>;
+                onChange(syntheticEvent);
+                onClearErrors("image");
+                setUploadMode('url');
+              }}
+            >
+              Sample
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex gap-2">
+          <Input
+            id="image"
+            name="image"
+            value={image}
+            onChange={onChange}
+            placeholder="https://example.com/image.jpg"
+            className={errors.image ? "border-red-500" : ""}
+          />
+          <Button 
+            type="button" 
+            variant="outline"
+            onClick={() => {
+              const randomImage = getRandomImage(category);
+              const syntheticEvent = {
+                target: {
+                  name: 'image',
+                  value: randomImage
+                }
+              } as React.ChangeEvent<HTMLInputElement>;
+              onChange(syntheticEvent);
+              onClearErrors("image");
+            }}
+          >
+            Sample
+          </Button>
+        </div>
+      )}
+      
       {errors.image && (
         <p className="text-red-500 text-sm mt-1">{errors.image}</p>
       )}
+      
       {image && (
         <div className="mt-2">
           <p className="text-xs text-gray-500 mb-1">Preview:</p>
@@ -77,3 +165,83 @@ const ProductFormImageField = ({
 };
 
 export default ProductFormImageField;
+
+
+// import { useState } from "react";
+// import { Label } from "@/components/ui/label";
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
+
+// interface ProductFormImageFieldProps {
+//   image: string;
+//   errors: Record<string, string>;
+//   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+//   getRandomImage: (category: string) => string;
+//   category: string;
+//   onClearErrors: (field: string) => void;
+// }
+
+// const ProductFormImageField = ({ 
+//   image, 
+//   errors, 
+//   onChange, 
+//   getRandomImage,
+//   category,
+//   onClearErrors
+// }: ProductFormImageFieldProps) => {
+//   return (
+//     <div>
+//       <Label htmlFor="image" className={errors.image ? "text-red-500" : ""}>
+//         Image URL *
+//       </Label>
+//       <div className="flex gap-2">
+//         <Input
+//           id="image"
+//           name="image"
+//           value={image}
+//           onChange={onChange}
+//           placeholder="https://example.com/image.jpg"
+//           className={errors.image ? "border-red-500" : ""}
+//         />
+//         <Button 
+//           type="button" 
+//           variant="outline"
+//           onClick={() => {
+//             const randomImage = getRandomImage(category);
+//             // Using a custom event to simulate onChange
+//             const syntheticEvent = {
+//               target: {
+//                 name: 'image',
+//                 value: randomImage
+//               }
+//             } as React.ChangeEvent<HTMLInputElement>;
+//             onChange(syntheticEvent);
+//             onClearErrors("image");
+//           }}
+//         >
+//           Sample
+//         </Button>
+//       </div>
+//       {errors.image && (
+//         <p className="text-red-500 text-sm mt-1">{errors.image}</p>
+//       )}
+//       {image && (
+//         <div className="mt-2">
+//           <p className="text-xs text-gray-500 mb-1">Preview:</p>
+//           <div className="w-full h-40 border rounded-md overflow-hidden">
+//             <img
+//               src={image}
+//               alt="Preview"
+//               className="w-full h-full object-cover"
+//               onError={(e) => {
+//                 (e.target as HTMLImageElement).src = "https://placehold.co/600x400?text=Invalid+Image";
+//               }}
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ProductFormImageField;
