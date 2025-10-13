@@ -36,7 +36,7 @@ const Shop = () => {
     <>
       <Navbar />
       <main className=" pb-16">
-        <div className="mb-12 bg-gradient-to-r from-nanenane-900 to-nanenane-900 text-white py-0 pt-24"></div>
+        <div className="mb-12 bg-gradient-to-r from-nanenane-900 to-nanenane-900 text-white py-0 pt-0"></div>
 
         <section className="py-12">
           <div className="container-custom">
