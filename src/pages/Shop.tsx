@@ -36,7 +36,7 @@ const Shop = () => {
     <>
       <Navbar />
       <main className=" pb-16">
-        
+        <div className="pb-12"></div>
 
         <section className="py-12">
           <div className="container-custom">
