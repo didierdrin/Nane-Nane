@@ -28,9 +28,11 @@ const App = () => (
           <Sonner />
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Index />} />
+            {/* <Route path="/" element={<Index />} /> */}
+            <Route path="/" element={<Shop />} />
             <Route path="/about" element={<About />} />
-            <Route path="/shop" element={<Shop />} />
+            <Route path="/explore" element={<Index />} />
+            {/* <Route path="/shop" element={<Shop />} /> */}
             <Route path="/tourism" element={<Tourism />} />
             <Route path="/invest" element={<Invest />} />
             <Route path="/contact" element={<Contact />} />

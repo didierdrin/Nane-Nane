@@ -31,9 +31,9 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Home</Link></li>
+              <li><Link to="/explore" className="text-gray-300 hover:text-white transition-colors">Home</Link></li>
               <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/shop" className="text-gray-300 hover:text-white transition-colors">Shop</Link></li>
+              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Shop</Link></li>
               {/* <li><Link to="/tourism" className="text-gray-300 hover:text-white transition-colors">Tourism</Link></li>
               <li><Link to="/invest" className="text-gray-300 hover:text-white transition-colors">Invest With Us</Link></li> */}
               <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link></li>
@@ -44,10 +44,10 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Our Services</h3>
             <ul className="space-y-2">
-              <li><Link to="/shop" className="text-gray-300 hover:text-white transition-colors">Fish Farming</Link></li>
-              <li><Link to="/shop" className="text-gray-300 hover:text-white transition-colors">Cold-Chain Aggregation</Link></li>
-              <li><Link to="/shop" className="text-gray-300 hover:text-white transition-colors">Value-Added Processing</Link></li>
-              <li><Link to="/shop" className="text-gray-300 hover:text-white transition-colors">Smart Distribution</Link></li>
+              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Fish Farming</Link></li>
+              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Cold-Chain Aggregation</Link></li>
+              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Value-Added Processing</Link></li>
+              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Smart Distribution</Link></li>
             </ul>
           </div>
 

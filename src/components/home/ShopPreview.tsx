@@ -130,7 +130,7 @@ const ShopPreview = () => {
                   message={activeCategory.whatsappMessage}
                   className="bg-green-600 hover:bg-green-700 flex items-center justify-center group"
                 />
-                <Link to="/shop" className="btn-outline flex items-center justify-center gap-2 group">
+                <Link to="/" className="btn-outline flex items-center justify-center gap-2 group">
                   View All Products
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </Link>

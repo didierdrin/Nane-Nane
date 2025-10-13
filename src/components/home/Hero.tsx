@@ -68,7 +68,7 @@ const Hero = () => {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
-                to="/shop" 
+                to="/" 
                 className="btn-primary flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-600 to-lime-600 hover:from-cyan-700 hover:to-lime-700 px-8 py-4 rounded-full text-lg font-semibold transition-all hover:scale-105 shadow-lg"
               >
                 Order Now <ArrowRight size={20} />
