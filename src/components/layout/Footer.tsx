@@ -71,7 +71,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-6 text-sm text-gray-400 text-center">
+        <div className="border-t border-gray-500 mt-12 pt-6 text-sm text-gray-400 text-center">
           <p>&copy; {new Date().getFullYear()} Nane Nane Aquaculture & Sustainable aggregation. All rights reserved.</p>
         </div>
       </div>
