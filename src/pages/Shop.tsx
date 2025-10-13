@@ -36,7 +36,7 @@ const Shop = () => {
     <>
       <Navbar />
       <main className=" pb-16">
-        <div className="mb-12 bg-gradient-to-r from-nanenane-900 to-nanenane-900 text-white py-16 pt-0"></div>
+        <div className="mb-8 bg-gradient-to-r from-nanenane-900 to-nanenane-900 text-white py-16 pt-0"></div>
 
         <section className="py-12">
           <div className="container-custom">
@@ -179,15 +179,7 @@ const Shop = () => {
           </div>
         </section>
 
-        
-        <section className="bg-gradient-to-r from-nanenane-900 to-nanenane-900 text-white py-16 pt-24">
-          <div className="container-custom">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">Shop Our Products</h1>
-            <p className="max-w-2xl text-nanenane-100 text-lg animate-fade-in delay-100">
-              From fresh fish to processed products and farming inputs, we provide everything you need in our integrated fish value chain.
-            </p>
-          </div>
-        </section>
+      
 
         {/* How To Order Section */}
         <section className="py-16 bg-white">
@@ -255,6 +247,27 @@ const Shop = () => {
           </div>
         </section>
       </main>
+
+      {/* <section className="bg-gradient-to-r from-nanenane-900 to-nanenane-900 text-white py-16 pt-24">
+          <div className="container-custom">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">Shop Our Products</h1>
+            <p className="max-w-2xl text-nanenane-100 text-lg animate-fade-in delay-100">
+              From fresh fish to processed products and farming inputs, we provide everything you need in our integrated fish value chain.
+            </p>
+          </div>
+        </section> */}
+
+<section className="relative bg-cover bg-center text-white py-16 pt-24" style={{ backgroundImage: `url('/tanzania.png')` }}>
+  <div className="absolute inset-0 bg-black bg-opacity-40"></div> {/* Overlay for text readability */}
+  <div className="container-custom relative z-10">
+    <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">Shop Our Products</h1>
+    <p className="max-w-2xl text-nanenane-100 text-lg animate-fade-in delay-100">
+      From fresh fish to processed products and farming inputs, we provide everything you need in our integrated fish value chain.
+    </p>
+  </div>
+</section>
+
+
       <Footer />
     </>
   );
