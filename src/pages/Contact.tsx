@@ -8,9 +8,9 @@ const Contact = () => {
   return (
     <>
       <Navbar />
-      <main className="pt-24 pb-16">
+      <main>
         {/* Hero Section */}
-        <section className="bg-nanenane-900 text-white py-16">
+        <section className="pt-28 pb-16 bg-nanenane-900 text-white">
           <div className="container-custom">
             <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
             <p className="max-w-2xl text-nanenane-100">

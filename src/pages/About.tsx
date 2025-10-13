@@ -39,9 +39,9 @@ const About = () => {
   return (
     <>
       <Navbar />
-      <main className="pt-24 pb-16">
+      <main>
         {/* Hero Section */}
-        <section className="bg-nanenane-900 text-white py-16">
+        <section className="pt-28 pb-16 bg-nanenane-900 text-white">
           <div className="container-custom">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">About Nane Nane</h1>
             <p className="text-xl text-nanenane-100 max-w-2xl">
