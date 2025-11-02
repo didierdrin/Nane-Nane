@@ -82,7 +82,7 @@ const AdminDashboard = () => {
                   className="text-blue-600 hover:underline flex items-center"
                 >
                   <Package className="mr-2 h-4 w-4" />
-                  Updates
+                  Content Updates
                 </Link>
                 <Link 
                   to="/" 
