@@ -47,7 +47,25 @@ export type Database = {
           whatsapp_message?: string
         }
         Relationships: []
+      }, 
+      site_content: {
+        Row: {
+          id: number
+          content: any // or use a more specific type
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          content: any
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          content?: any
+          updated_at?: string
+        }
       }
+    
     }
     Views: {
       [_ in never]: never

@@ -78,6 +78,13 @@ const AdminDashboard = () => {
                   Add New Product
                 </Link>
                 <Link 
+                  to="/admin/content" 
+                  className="text-blue-600 hover:underline flex items-center"
+                >
+                  <Package className="mr-2 h-4 w-4" />
+                  Updates
+                </Link>
+                <Link 
                   to="/" 
                   className="text-blue-600 hover:underline flex items-center"
                   target="_blank"

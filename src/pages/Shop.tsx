@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useProducts } from "@/contexts/ProductContext";
 import { Spinner } from "@/components/ui/spinner";
+import { useContent } from "@/contexts/ContentContext"; 
 
 // Product categories with icons
 const categories = [
@@ -22,6 +23,7 @@ const Shop = () => {
   const { products, isLoading } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const { content, isLoading: contentLoading } = useContent(); 
 
   // Filter products based on selected category
   const filteredProducts = selectedCategory === "all"
@@ -31,6 +33,20 @@ const Shop = () => {
   // Get the current category
   const currentCategory = categories.find(c => c.id === selectedCategory) || categories[0];
   const CategoryIcon = currentCategory.icon;
+
+
+  // Default fallback data
+  const shopData = content?.shop || {
+    heroSubtitle: "From fresh fish to processed products and farming inputs, we provide everything you need in our integrated fish value chain.",
+    howToOrder: [
+      { number: "1", title: "Browse Our Products", subtitle: "Select the product category..." },
+      { number: "2", title: "Click \"Order Now\"", subtitle: "You'll be connected..." },
+      { number: "3", title: "Confirm Order & Payment", subtitle: "Our team will provide..." },
+      { number: "4", title: "Delivery or Implementation", subtitle: "For products, choose..." }
+    ],
+    readyText: "Ready to get started?"
+  };
+
 
   return (
     <>
@@ -181,8 +197,48 @@ const Shop = () => {
 
       
 
+
+      {/* How To Order Section - UPDATED */}
+      <section className="py-16 bg-white">
+          <div className="container-custom">
+            <h2 className="text-3xl font-bold mb-12 text-center text-gradient">How To Order</h2>
+            
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white p-8 rounded-xl shadow-xl border border-nanenane-100">
+                <ol className="space-y-8 relative before:absolute before:top-0 before:left-4 before:bottom-0 before:w-0.5 before:bg-nanenane-100">
+                  {shopData.howToOrder.map((step, index) => (
+                    <li key={index} className="flex ml-6">
+                      <div className="bg-nanenane-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-4 flex-shrink-0 -ml-10 z-10">
+                        <span className="font-bold">{step.number}</span>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-nanenane-800 text-lg mb-1">{step.title}</h3>
+                        <p className="text-gray-600">{step.subtitle}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                
+                <div className="mt-12 text-center p-6 bg-nanenane-50 rounded-lg">
+                  <h3 className="text-lg font-semibold text-nanenane-800 mb-3">{shopData.readyText}</h3>
+                  <p className="text-gray-700 mb-4">
+                    For bulk orders, special requests, or investment inquiries, contact our sales team directly.
+                  </p>
+                  <WhatsAppButton 
+                    text="Contact Sales Team" 
+                    phoneNumber="+255755823336" 
+                    message="Hello, I would like to place a bulk order."
+                    className="bg-green-600 hover:bg-green-700" 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+
         {/* How To Order Section */}
-        <section className="py-16 bg-white">
+        {/* <section className="py-16 bg-white">
           <div className="container-custom">
             <h2 className="text-3xl font-bold mb-12 text-center text-gradient">How To Order</h2>
             
@@ -245,7 +301,7 @@ const Shop = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
 
       {/* <section className="bg-gradient-to-r from-nanenane-900 to-nanenane-900 text-white py-16 pt-24">
@@ -257,15 +313,26 @@ const Shop = () => {
           </div>
         </section> */}
 
-<section className="relative bg-cover bg-center text-white py-16 pt-24" style={{ backgroundImage: `url('/tanzania.png')` }}>
-  <div className="absolute inset-0 bg-black bg-opacity-40"></div> {/* Overlay for text readability */}
+        {/* Hero Section - UPDATED */}
+      <section className="relative bg-cover bg-center text-white py-16 pt-24" style={{ backgroundImage: `url('/tanzania.png')` }}>
+        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div className="container-custom relative z-10">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">Shop Our Products</h1>
+          <p className="max-w-2xl text-nanenane-100 text-lg animate-fade-in delay-100">
+            {shopData.heroSubtitle}
+          </p>
+        </div>
+      </section>
+
+{/* <section className="relative bg-cover bg-center text-white py-16 pt-24" style={{ backgroundImage: `url('/tanzania.png')` }}>
+  <div className="absolute inset-0 bg-black bg-opacity-40"></div> 
   <div className="container-custom relative z-10">
     <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">Shop Our Products</h1>
     <p className="max-w-2xl text-nanenane-100 text-lg animate-fade-in delay-100">
       From fresh fish to processed products and farming inputs, we provide everything you need in our integrated fish value chain.
     </p>
   </div>
-</section>
+</section> */}
 
 
       <Footer />
