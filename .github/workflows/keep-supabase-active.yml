@@ -1,0 +1,21 @@
+name: Keep Supabase Active
+
+on:
+  schedule:
+    # Run every 6 days to ensure activity within 7-day window
+    - cron: '0 12 */6 * *'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Execute SQL query to keep Supabase active
+      run: |
+        # Using environment variables from GitHub Secrets
+        curl -X POST "https://${{ secrets.SUPABASE_PROJECT_REF }}.supabase.co/rest/v1/rpc/execute_sql" \
+          -H "Content-Type: application/json" \
+          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+          -d '{"query": "SELECT 1;"}'
