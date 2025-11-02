@@ -2,7 +2,7 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProducts } from "@/contexts/ProductContext";
-import { ShoppingCart, Package, DollarSign } from "lucide-react";
+import { ShoppingCart, Package, DollarSign, Timer } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
@@ -81,7 +81,7 @@ const AdminDashboard = () => {
                   to="/admin/content" 
                   className="text-blue-600 hover:underline flex items-center"
                 >
-                  <Package className="mr-2 h-4 w-4" />
+                  <Timer className="mr-2 h-4 w-4" />
                   Content Updates
                 </Link>
                 <Link 
