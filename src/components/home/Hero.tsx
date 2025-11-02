@@ -17,8 +17,7 @@ const images = [
   "https://i.ibb.co/1fQv2dxR/IMG-20250505-WA0019.jpg",
 ];
 
-
-export const Hero = () => {
+const Hero = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { content } = useContent();
 
@@ -32,39 +31,53 @@ export const Hero = () => {
         prevIndex === images.length - 1 ? 0 : prevIndex + 1
       );
     }, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
+  // Parse the title to handle the line break and styling
+  const titleLines = heroData.title.split('\n');
+
   return (
     <div className="relative h-screen min-h-[600px] overflow-hidden">
+      {/* Parallax Background Slideshow */}
       <div className="absolute inset-0 z-0">
         {images.map((image, index) => (
           <div 
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
               index === currentImageIndex ? "opacity-100" : "opacity-0"
             }`}
             style={{
               backgroundImage: `url(${image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              backgroundAttachment: 'fixed'
+              backgroundAttachment: 'fixed',
+              transform: `scale(${index === currentImageIndex ? 1 : 1.05})`,
+              transition: 'transform 10s ease-out'
             }}
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/70"></div>
       </div>
 
+      {/* Content */}
       <div className="relative z-10 h-full flex items-center">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl backdrop-blur-sm bg-white/5 p-8 rounded-2xl border border-white/10">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              {heroData.title.split('\n').map((line, i) => (
+              {titleLines.map((line, i) => (
                 <span key={i}>
-                  {line.includes('Fresh') && <span className="text-lime-300">Fresh</span>}
-                  {line.includes('Made') && <span className="text-cyan-300">Made</span>}
-                  {!line.includes('Fresh') && !line.includes('Made') && line}
-                  {i === 0 && <br />}
+                  {line.includes('Fresh') ? (
+                    <span className="text-lime-300">Fresh</span>
+                  ) : line.includes('Made') ? (
+                    <span className="text-cyan-300">Made</span>
+                  ) : (
+                    line
+                  )}
+                  {line.includes('Lake Victoria') && ' from Lake Victoria'}
+                  {line.includes('Your Plate') && ' for Your Plate'}
+                  {i < titleLines.length - 1 && <br />}
                 </span>
               ))}
             </h1>
@@ -90,10 +103,15 @@ export const Hero = () => {
           </div>
         </div>
       </div>
+
+      {/* Animated Waves */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 overflow-hidden z-0">
+      </div>
     </div>
   );
 };
 
+export default Hero;
 
 // import { ArrowRight, Fish, Truck } from "lucide-react";
 // import { Link } from "react-router-dom";

@@ -29,12 +29,12 @@ const CountUp = ({ endValue, duration = 2000, suffix = "" }: { endValue: number;
   return <>{Number(count.toFixed(1)).toLocaleString()}{suffix}</>;
 };
 
-export const StatsSection = () => {
+const StatsSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { content } = useContent();
   
   const impactData = content?.explore?.impact || {
-    subtitle: "Through our integrated fish value chain...",
+    subtitle: "Through our integrated fish value chain, we're creating sustainable impact in Tanzania by increasing incomes, creating jobs, and reducing food waste.",
     incomeIncrease: "15",
     jobsCreated: "15",
     protein: "11.2",
@@ -105,7 +105,7 @@ export const StatsSection = () => {
           {stats.map((stat, index) => (
             <div 
               key={index}
-              className="bg-white p-6 rounded-lg shadow-md text-center card-hover"
+              className={`bg-white p-6 rounded-lg shadow-md text-center card-hover animate-fade-in delay-${index * 100}`}
             >
               <div className="flex justify-center mb-4 animate-float">
                 {stat.icon}
@@ -128,6 +128,8 @@ export const StatsSection = () => {
     </section>
   );
 };
+
+export default StatsSection;
 
 // import { TrendingUp, Users, Package, Leaf } from "lucide-react";
 // import { useEffect, useState } from "react";
