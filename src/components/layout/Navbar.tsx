@@ -36,10 +36,16 @@ const Navbar = () => {
       <div className="container-custom flex justify-between items-center">
         {/* Logo */}
         <Link to="/explore" className="z-10">
+  <h1 className="text-2xl font-bold text-nanenane-800">
+    <span className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">NANE</span>
+    <span className="text-lake-600">NANE</span>
+  </h1>
+</Link>
+        {/* <Link to="/explore" className="z-10">
           <h1 className="text-2xl font-bold text-nanenane-800">
             NANE<span className="text-lake-600">NANE</span>
           </h1>
-        </Link>
+        </Link> */}
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">

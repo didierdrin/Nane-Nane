@@ -52,7 +52,7 @@ const Shop = () => {
     <>
       <Navbar />
       <main className=" pb-16">
-        <div className="mb-8 bg-gradient-to-b from-nanenane-900 to-nanenane-700 text-white py-16 pt-0"></div>
+        <div className="mb-4 bg-gradient-to-b from-nanenane-900 to-nanenane-700 text-white py-16 pt-0"></div>
 
         <section className="py-12">
           <div className="container-custom">
