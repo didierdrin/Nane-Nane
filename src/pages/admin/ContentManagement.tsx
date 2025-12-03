@@ -187,6 +187,14 @@ const ContentManagement = () => {
     }
   };
 
+  const resetSectionToDefaults = async (section) => {
+    if (window.confirm(`Are you sure you want to reset ${section} section to default values?`)) {
+      const newContent = { ...content, [section]: defaultContent[section] };
+      setContent(newContent);
+      await saveContent(newContent);
+    }
+  };
+
   const updateField = (path, value) => {
     setContent(prev => {
       const newContent = JSON.parse(JSON.stringify(prev));
@@ -266,49 +274,21 @@ const ContentManagement = () => {
             <TabsTrigger value="explore">Explore</TabsTrigger>
           </TabsList>
 
-          {/* Footer Content */}
-          <TabsContent value="footer" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Footer Content</CardTitle>
-                <CardDescription>Update footer information displayed across all pages</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="footer-description">Company Description</Label>
-                  <Textarea
-                    id="footer-description"
-                    value={content.footer.description}
-                    onChange={(e) => updateField('footer.description', e.target.value)}
-                    rows={3}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="footer-address">Address</Label>
-                  <Input
-                    id="footer-address"
-                    value={content.footer.address}
-                    onChange={(e) => updateField('footer.address', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="footer-phone">Phone Number</Label>
-                  <Input
-                    id="footer-phone"
-                    value={content.footer.phone}
-                    onChange={(e) => updateField('footer.phone', e.target.value)}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
+         
           {/* Shop Content */}
           <TabsContent value="shop" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Shop Page Content</CardTitle>
-                <CardDescription>Update shop page hero and order process</CardDescription>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>Shop Page Content</CardTitle>
+                    <CardDescription>Update shop page hero and order process</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => resetSectionToDefaults('shop')}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Reset Section
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
@@ -358,8 +338,16 @@ const ContentManagement = () => {
           <TabsContent value="about" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>About Page Content</CardTitle>
-                <CardDescription>Update about page information</CardDescription>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>About Page Content</CardTitle>
+                    <CardDescription>Update about page information</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => resetSectionToDefaults('about')}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Reset Section
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -461,8 +449,16 @@ const ContentManagement = () => {
           <TabsContent value="contact" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Contact Page Content</CardTitle>
-                <CardDescription>Update contact page information</CardDescription>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>Contact Page Content</CardTitle>
+                    <CardDescription>Update contact page information</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => resetSectionToDefaults('contact')}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Reset Section
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -589,8 +585,16 @@ const ContentManagement = () => {
           <TabsContent value="explore" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Explore Page Content</CardTitle>
-                <CardDescription>Update explore/home page content</CardDescription>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>Explore Page Content</CardTitle>
+                    <CardDescription>Update explore/home page content</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => resetSectionToDefaults('explore')}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Reset Section
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -719,6 +723,53 @@ const ContentManagement = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+           {/* Footer Content */}
+           <TabsContent value="footer" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>Footer Content</CardTitle>
+                    <CardDescription>Update footer information displayed across all pages</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => resetSectionToDefaults('footer')}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Reset Section
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="footer-description">Company Description</Label>
+                  <Textarea
+                    id="footer-description"
+                    value={content.footer.description}
+                    onChange={(e) => updateField('footer.description', e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="footer-address">Address</Label>
+                  <Input
+                    id="footer-address"
+                    value={content.footer.address}
+                    onChange={(e) => updateField('footer.address', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="footer-phone">Phone Number</Label>
+                  <Input
+                    id="footer-phone"
+                    value={content.footer.phone}
+                    onChange={(e) => updateField('footer.phone', e.target.value)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+
         </Tabs>
       </div>
     </AdminLayout>
