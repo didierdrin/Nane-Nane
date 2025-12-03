@@ -34,11 +34,11 @@ const Contact = () => {
     <>
       <Navbar />
       <main>
-        {/* Hero Section */}
+        {/* Hero Section text-nanenane-100 */}
         <section className="pt-28 pb-16 bg-gradient-to-b from-nanenane-900 to-white text-white">
           <div className="container-custom">
             <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-            <p className="max-w-2xl text-nanenane-100">
+            <p className="max-w-2xl text-slate-500">
               {contactData.subtitle}
             </p>
           </div>
