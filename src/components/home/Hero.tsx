@@ -68,15 +68,15 @@ const Hero = () => {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               {titleLines.map((line, i) => (
                 <span key={i}>
-                  {line.includes('Fresh') ? (
-                    <span className="text-lime-300">Fresh</span>
-                  ) : line.includes('Made') ? (
-                    <span className="text-cyan-300">Made</span>
-                  ) : (
-                    line
-                  )}
-                  {line.includes('Lake Victoria') && ' from Lake Victoria'}
-                  {line.includes('Your Plate') && ' for Your Plate'}
+                  {line.split(' ').map((word, wordIndex) => {
+                    if (word === 'Fresh') {
+                      return <span key={wordIndex} className="text-lime-300">Fresh </span>;
+                    } else if (word === 'Made') {
+                      return <span key={wordIndex} className="text-cyan-300">Made </span>;
+                    } else {
+                      return word + (wordIndex < line.split(' ').length - 1 ? ' ' : '');
+                    }
+                  })}
                   {i < titleLines.length - 1 && <br />}
                 </span>
               ))}
