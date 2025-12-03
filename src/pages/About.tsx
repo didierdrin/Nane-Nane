@@ -63,7 +63,7 @@ const About = () => {
         <section className="pt-28 pb-16 bg-gradient-to-b from-nanenane-900 to-white text-white">
           <div className="container-custom">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">About Nane Nane</h1>
-            <p className="text-xl text-slate-500 max-w-2xl">
+            <p className="text-xl text-slate-600 max-w-2xl">
               {aboutData.subtitle}
             </p>
           </div>
