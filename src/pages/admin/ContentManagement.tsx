@@ -266,12 +266,12 @@ const ContentManagement = () => {
         )}
 
         <Tabs defaultValue="footer" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="footer">Footer</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5">            
             <TabsTrigger value="shop">Shop</TabsTrigger>
             <TabsTrigger value="about">About</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
             <TabsTrigger value="explore">Explore</TabsTrigger>
+            <TabsTrigger value="footer">Footer</TabsTrigger>
           </TabsList>
 
          
