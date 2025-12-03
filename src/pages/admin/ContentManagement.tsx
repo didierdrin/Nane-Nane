@@ -13,11 +13,6 @@ import AdminLayout from '@/components/admin/AdminLayout';
 
 // Default content structure
 const defaultContent = {
-  footer: {
-    description: "A Tanzanian-led, tech-enabled fish company solving protein deficiency and post-harvest loss across East Africa.",
-    address: "Kongolo, Mwanza, Tanzania",
-    phone: "+255 755 823 336"
-  },
   shop: {
     howToOrder: [
       {
@@ -118,6 +113,11 @@ const defaultContent = {
         buttonText: "Order Fresh Nile Perch"
       }
     }
+  }, 
+  footer: {
+    description: "A Tanzanian-led, tech-enabled fish company solving protein deficiency and post-harvest loss across East Africa.",
+    address: "Kongolo, Mwanza, Tanzania",
+    phone: "+255 755 823 336"
   }
 };
 
