@@ -37,7 +37,7 @@ const Navbar = () => {
         {/* Logo */}
         <Link to="/explore" className="z-10">
   <h1 className="text-2xl font-bold text-nanenane-800">
-    <span className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">NANE</span>
+    <span className="drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">NANE</span>
     <span className="text-lake-600">NANE</span>
   </h1>
 </Link>
