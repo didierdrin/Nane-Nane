@@ -182,7 +182,7 @@ const Shop = () => {
                           <WhatsAppButton 
                             text="Inquire Now" 
                             phoneNumber="+255755823336" 
-                            message={product.whatsapp_message}
+                            message={`Hi! I'm interested in ${product.name}. Price: ${Number(product.price).toLocaleString()} TZS${product.weight ? `, Weight: ${product.weight}` : ''}. ${product.whatsapp_message}`}
                             className="w-full bg-green-600 hover:bg-green-700" 
                           />
                         </CardFooter>
