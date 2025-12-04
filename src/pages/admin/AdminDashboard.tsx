@@ -2,59 +2,148 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useProducts } from "@/contexts/ProductContext";
 import { ShoppingCart, Package, DollarSign, Timer, Users, Check, X, Edit, Trash2, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
   const { products } = useProducts();
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingAdmin, setEditingAdmin] = useState(null);
+  const [editPhone, setEditPhone] = useState("");
+  const [isActivePhone, setIsActivePhone] = useState(false);
+  const { toast } = useToast();
 
-  // Get current user and set as admin
+  // Fetch all users from a custom admin_users table
   useEffect(() => {
-    const getCurrentUser = async () => {
+    const fetchAdmins = async () => {
       try {
+        // First, get current user to check permissions
         const { data: { user } } = await supabase.auth.getUser();
         
-        if (user) {
-          const currentAdmin = {
-            id: user.id,
-            username: user.user_metadata?.username || user.email?.split('@')[0] || 'Admin',
-            email: user.email || 'No email',
-            role: user.email === 'nsedidier@gmail.com' ? 'super_admin' : 'admin',
-            status: 'active',
-            phone: user.user_metadata?.phone || '+255755823336'
-          };
-          
-          setAdmins([currentAdmin]);
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        // Try to fetch from admin_users table, if it doesn't exist, create mock data
+        const { data: adminUsers, error } = await supabase
+          .from('admin_users')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (error && error.code === '42P01') {
+          // Table doesn't exist, create mock data including current user
+          const mockAdmins = [
+            {
+              id: user.id,
+              username: user.user_metadata?.username || user.email?.split('@')[0] || 'Admin',
+              email: user.email,
+              role: user.email === 'nsedidier@gmail.com' ? 'super_admin' : 'admin',
+              status: 'active',
+              phone: user.user_metadata?.phone || '+255755823336',
+              is_active_phone: true
+            },
+            {
+              id: 'pending-1',
+              username: 'john_doe',
+              email: 'john@example.com',
+              role: 'admin',
+              status: 'pending',
+              phone: '+255700000001',
+              is_active_phone: false
+            },
+            {
+              id: 'pending-2',
+              username: 'jane_smith',
+              email: 'jane@example.com',
+              role: 'admin',
+              status: 'pending',
+              phone: '+255700000002',
+              is_active_phone: false
+            }
+          ];
+          setAdmins(mockAdmins);
+        } else if (adminUsers) {
+          setAdmins(adminUsers);
         }
       } catch (error) {
-        console.error('Error fetching current user:', error);
+        console.error('Error fetching admins:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    getCurrentUser();
+    fetchAdmins();
   }, []);
 
-  const confirmAdmin = (id: number) => {
-    setAdmins(prev => prev.map(admin => 
-      admin.id === id ? { ...admin, status: "active" } : admin
-    ));
+  const confirmAdmin = async (id) => {
+    try {
+      setAdmins(prev => prev.map(admin => 
+        admin.id === id ? { ...admin, status: "active" } : admin
+      ));
+      toast({ title: "Success", description: "Admin confirmed successfully" });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to confirm admin", variant: "destructive" });
+    }
   };
 
-  const deleteAdmin = (id: number) => {
-    setAdmins(prev => prev.filter(admin => admin.id !== id));
+  const deleteAdmin = async (id) => {
+    try {
+      setAdmins(prev => prev.filter(admin => admin.id !== id));
+      toast({ title: "Success", description: "Admin deleted successfully" });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete admin", variant: "destructive" });
+    }
   };
 
-  const promoteToSuperAdmin = (id: number) => {
-    setAdmins(prev => prev.map(admin => 
-      admin.id === id ? { ...admin, role: "super_admin" } : admin
-    ));
+  const promoteToSuperAdmin = async (id) => {
+    try {
+      setAdmins(prev => prev.map(admin => 
+        admin.id === id ? { ...admin, role: "super_admin" } : admin
+      ));
+      toast({ title: "Success", description: "Admin promoted to super admin" });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to promote admin", variant: "destructive" });
+    }
+  };
+
+  const openEditDialog = (admin) => {
+    setEditingAdmin(admin);
+    setEditPhone(admin.phone || "");
+    setIsActivePhone(admin.is_active_phone || false);
+  };
+
+  const saveAdminEdit = async () => {
+    try {
+      setAdmins(prev => prev.map(admin => {
+        if (admin.id === editingAdmin.id) {
+          return {
+            ...admin,
+            phone: editPhone,
+            is_active_phone: isActivePhone
+          };
+        }
+        // If this admin is being set as active, deactivate others
+        if (isActivePhone && admin.is_active_phone) {
+          return { ...admin, is_active_phone: false };
+        }
+        return admin;
+      }));
+      
+      setEditingAdmin(null);
+      toast({ title: "Success", description: "Admin details updated successfully" });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to update admin", variant: "destructive" });
+    }
   };
 
   // Get counts of different categories
@@ -96,7 +185,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Equipment Products</CardTitle>
-              <DollarSign className="h-4 w-4 text-green-600" />
+              {/* <DollarSign className="h-4 w-4 text-green-600" /> */}
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{nileProducts}</div>
@@ -202,9 +291,40 @@ const AdminDashboard = () => {
                         <Check className="h-4 w-4" />
                       </Button>
                     )}
-                    <Button size="sm" variant="outline">
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button size="sm" variant="outline" onClick={() => openEditDialog(admin)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit Admin Details</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="phone">Phone Number</Label>
+                            <Input
+                              id="phone"
+                              value={editPhone}
+                              onChange={(e) => setEditPhone(e.target.value)}
+                              placeholder="+255700000000"
+                            />
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="active-phone"
+                              checked={isActivePhone}
+                              onCheckedChange={setIsActivePhone}
+                            />
+                            <Label htmlFor="active-phone">Set as active phone for inquiries</Label>
+                          </div>
+                          <Button onClick={saveAdminEdit} className="w-full">
+                            Save Changes
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                     {admin.role !== "super_admin" && (
                       <Button size="sm" variant="outline" onClick={() => promoteToSuperAdmin(admin.id)}>
                         <Crown className="h-4 w-4" />

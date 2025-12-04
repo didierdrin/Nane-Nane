@@ -27,14 +27,26 @@ const Shop = () => {
   const { content, isLoading: contentLoading } = useContent();
   const [adminPhoneNumber, setAdminPhoneNumber] = useState("+255755823336");
 
-  // Fetch admin phone number from user metadata or use default
+  // Fetch active admin phone number
   useEffect(() => {
     const fetchAdminPhone = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        // Try to get active admin phone from admin_users table
+        const { data: activeAdmin, error } = await supabase
+          .from('admin_users')
+          .select('phone')
+          .eq('is_active_phone', true)
+          .eq('status', 'active')
+          .single();
         
-        if (user?.user_metadata?.phone) {
-          setAdminPhoneNumber(user.user_metadata.phone);
+        if (activeAdmin?.phone) {
+          setAdminPhoneNumber(activeAdmin.phone);
+        } else {
+          // Fallback to current user's phone or default
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user?.user_metadata?.phone) {
+            setAdminPhoneNumber(user.user_metadata.phone);
+          }
         }
       } catch (error) {
         console.error('Error fetching admin phone:', error);
