@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useProducts } from "@/contexts/ProductContext";
 import { Spinner } from "@/components/ui/spinner";
-import { useContent } from "@/contexts/ContentContext"; 
+import { useContent } from "@/contexts/ContentContext";
+import { supabase } from "@/integrations/supabase/client"; 
 
 // Product categories with icons
 const categories = [
@@ -23,7 +24,29 @@ const Shop = () => {
   const { products, isLoading } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const { content, isLoading: contentLoading } = useContent(); 
+  const { content, isLoading: contentLoading } = useContent();
+  const [adminPhoneNumber, setAdminPhoneNumber] = useState("+255755823336");
+
+  // Fetch admin phone number
+  useEffect(() => {
+    const fetchAdminPhone = async () => {
+      try {
+        const { data } = await supabase
+          .from('site_content')
+          .select('content')
+          .eq('id', 1)
+          .single();
+        
+        if (data?.content?.adminPhone) {
+          setAdminPhoneNumber(data.content.adminPhone);
+        }
+      } catch (error) {
+        console.error('Error fetching admin phone:', error);
+      }
+    };
+    
+    fetchAdminPhone();
+  }, []); 
 
   // Filter products based on selected category
   const filteredProducts = selectedCategory === "all"
@@ -100,7 +123,7 @@ const Shop = () => {
                     </p>
                     <WhatsAppButton 
                       text="Contact Sales Team" 
-                      phoneNumber="+255755823336" 
+                      phoneNumber={adminPhoneNumber} 
                       message="Hello, I have a question about your products."
                       className="w-full bg-green-600 hover:bg-green-700" 
                     />
@@ -177,12 +200,12 @@ const Shop = () => {
                              product.category === 'inputs' ? 'Nile Perch' : 'Investment Opportunity'}
                           </div>
                         </CardContent>
-                        
+                        {/* ${product.whatsapp_message} */}
                         <CardFooter className="pt-0">
                           <WhatsAppButton 
                             text="Inquire Now" 
-                            phoneNumber="+255755823336" 
-                            message={`Hi! I'm interested in ${product.name}. Price: ${Number(product.price).toLocaleString()} TZS${product.weight ? `, Weight: ${product.weight}` : ''}. ${product.whatsapp_message}`}
+                            phoneNumber={adminPhoneNumber} 
+                            message={`Hi! I'm interested in ${product.name}. Price: ${Number(product.price).toLocaleString()} TZS${product.weight ? `, Weight: ${product.weight}` : ''}.`}  
                             className="w-full bg-green-600 hover:bg-green-700" 
                           />
                         </CardFooter>
@@ -226,7 +249,7 @@ const Shop = () => {
                   </p>
                   <WhatsAppButton 
                     text="Contact Sales Team" 
-                    phoneNumber="+255755823336" 
+                    phoneNumber={adminPhoneNumber} 
                     message="Hello, I would like to place a bulk order."
                     className="bg-green-600 hover:bg-green-700" 
                   />

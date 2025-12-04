@@ -5,17 +5,44 @@ import { Button } from "@/components/ui/button";
 import { useProducts } from "@/contexts/ProductContext";
 import { ShoppingCart, Package, DollarSign, Timer, Users, Check, X, Edit, Trash2, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminDashboard = () => {
   const { products } = useProducts();
-  
-  // Mock admin data - replace with actual API calls
-  const [admins, setAdmins] = useState([
-    { id: 1, username: "admin", email: "admin@nanenane.com", role: "super_admin", status: "active" },
-    { id: 2, username: "john_admin", email: "john@nanenane.com", role: "admin", status: "active" },
-    { id: 3, username: "jane_pending", email: "jane@nanenane.com", role: "admin", status: "pending" }
-  ]);
+  const [admins, setAdmins] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch real users from Supabase auth
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const { data: { users }, error } = await supabase.auth.admin.listUsers();
+        
+        if (error) {
+          console.error('Error fetching users:', error);
+          return;
+        }
+
+        const formattedUsers = users.map(user => ({
+          id: user.id,
+          username: user.user_metadata?.username || user.email?.split('@')[0] || 'Unknown',
+          email: user.email || 'No email',
+          role: user.user_metadata?.role || 'admin',
+          status: user.email_confirmed_at ? 'active' : 'pending',
+          phone: user.user_metadata?.phone || null
+        }));
+        
+        setAdmins(formattedUsers);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const confirmAdmin = (id: number) => {
     setAdmins(prev => prev.map(admin => 
@@ -152,6 +179,11 @@ const AdminDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {loading ? (
+              <div className="text-center py-4">
+                <p className="text-gray-600">Loading users...</p>
+              </div>
+            ) : (
             <div className="space-y-4">
               {admins.map((admin) => (
                 <div key={admin.id} className="flex items-center justify-between p-3 border rounded-lg">
@@ -188,6 +220,7 @@ const AdminDashboard = () => {
                 </div>
               ))}
             </div>
+            )}
           </CardContent>
         </Card>
       </div>
