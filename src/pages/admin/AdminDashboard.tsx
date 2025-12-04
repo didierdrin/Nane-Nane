@@ -172,6 +172,9 @@ const AdminDashboard = () => {
 
   const saveAdminEdit = async () => {
     try {
+      // Format phone number to remove spaces
+      const formattedPhone = editPhone.replace(/\s+/g, '');
+      
       // Try to update in database first
       if (isActivePhone) {
         await supabase
@@ -183,7 +186,7 @@ const AdminDashboard = () => {
       const { error } = await supabase
         .from('admin_users')
         .update({ 
-          phone: editPhone,
+          phone: formattedPhone,
           is_active_phone: isActivePhone 
         })
         .eq('id', editingAdmin.id);
@@ -191,7 +194,7 @@ const AdminDashboard = () => {
       if (error) {
         // Fallback: update user metadata
         await supabase.auth.updateUser({
-          data: { phone: editPhone }
+          data: { phone: formattedPhone }
         });
       }
       
@@ -199,7 +202,7 @@ const AdminDashboard = () => {
         if (admin.id === editingAdmin.id) {
           return {
             ...admin,
-            phone: editPhone,
+            phone: formattedPhone,
             is_active_phone: isActivePhone
           };
         }
