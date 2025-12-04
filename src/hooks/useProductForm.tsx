@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client"; // ✅ Added import
 interface FormData {
   name: string;
   category: string;
+  weight: string;
   price: string;
   image: string;
   description: string;
@@ -18,6 +19,7 @@ interface FormData {
 const initialFormData: FormData = {
   name: "",
   category: "fish",
+  weight: "",
   price: "",
   image: "",
   description: "",
@@ -68,6 +70,7 @@ export const useProductForm = () => {
         setFormData({
           name: product.name,
           category: product.category,
+          weight: product.weight || "",
           price: product.price,
           image: product.image,
           description: product.description,
@@ -97,6 +100,7 @@ export const useProductForm = () => {
           setFormData({
             name: refreshedProduct.name,
             category: refreshedProduct.category,
+            weight: refreshedProduct.weight || "",
             price: refreshedProduct.price,
             image: refreshedProduct.image,
             description: refreshedProduct.description,
@@ -135,6 +139,10 @@ export const useProductForm = () => {
     
     if (!formData.name.trim()) {
       errors.name = "Product name is required";
+    }
+    
+    if (!formData.weight.trim()) {
+      errors.weight = "Weight is required";
     }
     
     if (!formData.price.trim()) {
@@ -265,6 +273,7 @@ export const useProductForm = () => {
           id: Number(id),
           name: formData.name,
           category: formData.category,
+          weight: formData.weight,
           price: formData.price,
           image: imageUrl, // ✅ Use uploaded URL
           description: formData.description,
@@ -290,6 +299,7 @@ export const useProductForm = () => {
         const success = await addProduct({
           name: formData.name,
           category: formData.category,
+          weight: formData.weight,
           price: formData.price,
           image: imageUrl, // ✅ Use uploaded URL
           description: formData.description,

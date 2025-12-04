@@ -376,6 +376,7 @@ const ProductList = () => {
                     <TableHead>Image</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Category</TableHead>
+                    <TableHead>Weight</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -419,7 +420,8 @@ const ProductList = () => {
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell>{product.price}</TableCell>
+                        <TableCell>{product.weight || 'N/A'}</TableCell>
+                        <TableCell>${product.price}</TableCell>
                         <TableCell>
                           {disabled ? (
                             <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">

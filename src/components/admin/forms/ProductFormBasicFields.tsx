@@ -12,6 +12,7 @@ import {
 interface ProductFormBasicFieldsProps {
   name: string;
   category: string;
+  weight: string;
   price: string;
   tag: string;
   errors: Record<string, string>;
@@ -22,6 +23,7 @@ interface ProductFormBasicFieldsProps {
 const ProductFormBasicFields = ({ 
   name, 
   category, 
+  weight,
   price, 
   tag, 
   errors, 
@@ -64,15 +66,34 @@ const ProductFormBasicFields = ({
       </div>
 
       <div>
+        <Label htmlFor="weight" className={errors.weight ? "text-red-500" : ""}>
+          Weight *
+        </Label>
+        <Input
+          id="weight"
+          name="weight"
+          value={weight}
+          onChange={onChange}
+          placeholder="e.g. 1kg, 2kg, 3kg"
+          className={errors.weight ? "border-red-500" : ""}
+        />
+        {errors.weight && (
+          <p className="text-red-500 text-sm mt-1">{errors.weight}</p>
+        )}
+      </div>
+
+      <div>
         <Label htmlFor="price" className={errors.price ? "text-red-500" : ""}>
-          Size *
+          Price *
         </Label>
         <Input
           id="price"
           name="price"
+          type="number"
+          step="0.01"
           value={price}
           onChange={onChange}
-          placeholder="e.g. Size: 1kg, 2kg, 3kg"
+          placeholder="e.g. 25.99"
           className={errors.price ? "border-red-500" : ""}
         />
         {errors.price && (

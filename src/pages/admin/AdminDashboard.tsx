@@ -1,12 +1,37 @@
 
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useProducts } from "@/contexts/ProductContext";
-import { ShoppingCart, Package, DollarSign, Timer } from "lucide-react";
+import { ShoppingCart, Package, DollarSign, Timer, Users, Check, X, Edit, Trash2, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const AdminDashboard = () => {
   const { products } = useProducts();
+  
+  // Mock admin data - replace with actual API calls
+  const [admins, setAdmins] = useState([
+    { id: 1, username: "admin", email: "admin@nanenane.com", role: "super_admin", status: "active" },
+    { id: 2, username: "john_admin", email: "john@nanenane.com", role: "admin", status: "active" },
+    { id: 3, username: "jane_pending", email: "jane@nanenane.com", role: "admin", status: "pending" }
+  ]);
+
+  const confirmAdmin = (id: number) => {
+    setAdmins(prev => prev.map(admin => 
+      admin.id === id ? { ...admin, status: "active" } : admin
+    ));
+  };
+
+  const deleteAdmin = (id: number) => {
+    setAdmins(prev => prev.filter(admin => admin.id !== id));
+  };
+
+  const promoteToSuperAdmin = (id: number) => {
+    setAdmins(prev => prev.map(admin => 
+      admin.id === id ? { ...admin, role: "super_admin" } : admin
+    ));
+  };
 
   // Get counts of different categories
   const fishProducts = products.filter(p => p.category === "fish").length;
@@ -118,6 +143,53 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Users className="mr-2 h-5 w-5" />
+              Admin Management
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {admins.map((admin) => (
+                <div key={admin.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium">{admin.username}</span>
+                      {admin.role === "super_admin" && <Crown className="h-4 w-4 text-yellow-500" />}
+                      <span className={`px-2 py-1 text-xs rounded ${
+                        admin.status === "active" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                      }`}>
+                        {admin.status}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500">{admin.email}</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {admin.status === "pending" && (
+                      <Button size="sm" onClick={() => confirmAdmin(admin.id)} className="bg-green-600 hover:bg-green-700">
+                        <Check className="h-4 w-4" />
+                      </Button>
+                    )}
+                    <Button size="sm" variant="outline">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    {admin.role !== "super_admin" && (
+                      <Button size="sm" variant="outline" onClick={() => promoteToSuperAdmin(admin.id)}>
+                        <Crown className="h-4 w-4" />
+                      </Button>
+                    )}
+                    <Button size="sm" variant="destructive" onClick={() => deleteAdmin(admin.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );

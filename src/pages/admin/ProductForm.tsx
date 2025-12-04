@@ -42,6 +42,7 @@ const ProductForm = () => {
             <ProductFormBasicFields
               name={formData.name}
               category={formData.category}
+              weight={formData.weight}
               price={formData.price}
               tag={formData.tag}
               errors={validationErrors}

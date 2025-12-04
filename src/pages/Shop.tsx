@@ -153,7 +153,7 @@ const Shop = () => {
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           />
                           <div className="absolute top-3 right-3 py-1 px-3 bg-white/90 backdrop-blur-sm rounded-full text-sm font-semibold text-nanenane-800 shadow-sm">
-                            {product.price}
+                            {product.price} TZS
                           </div>
                           {product.tag && (
                             <Badge className="absolute top-3 left-3 bg-nanenane-600 hover:bg-nanenane-700">
