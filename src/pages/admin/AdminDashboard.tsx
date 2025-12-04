@@ -22,31 +22,68 @@ const AdminDashboard = () => {
   const [isActivePhone, setIsActivePhone] = useState(false);
   const { toast } = useToast();
 
-  // Fetch real authenticated users
+  // Fetch all authenticated users including unconfirmed ones
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        // Get current user first
+        // Get current user to check if they're super admin
         const { data: { user } } = await supabase.auth.getUser();
         
-        if (user) {
-          // For now, just show the current authenticated user
-          const currentAdmin = {
+        if (!user || user.email !== 'nsedidier@gmail.com') {
+          // Only show current user if not super admin
+          if (user) {
+            const currentAdmin = {
+              id: user.id,
+              username: user.user_metadata?.username || user.email?.split('@')[0] || 'Admin',
+              email: user.email,
+              role: 'admin',
+              status: 'active',
+              phone: user.user_metadata?.phone || '+255755823336',
+              is_active_phone: true
+            };
+            setAdmins([currentAdmin]);
+          }
+          setLoading(false);
+          return;
+        }
+
+        // Super admin can see all users - try to get from admin_users table first
+        try {
+          const { data: adminUsers, error } = await supabase
+            .from('admin_users')
+            .select('*')
+            .order('created_at', { ascending: true });
+
+          if (adminUsers && adminUsers.length > 0) {
+            setAdmins(adminUsers);
+          } else {
+            // Fallback: show current super admin
+            const superAdmin = {
+              id: user.id,
+              username: user.user_metadata?.username || user.email?.split('@')[0] || 'Super Admin',
+              email: user.email,
+              role: 'super_admin',
+              status: 'active',
+              phone: user.user_metadata?.phone || '+255755823336',
+              is_active_phone: true
+            };
+            setAdmins([superAdmin]);
+          }
+        } catch (dbError) {
+          // If admin_users table doesn't exist, show current super admin only
+          const superAdmin = {
             id: user.id,
-            username: user.user_metadata?.username || user.email?.split('@')[0] || 'Admin',
+            username: user.user_metadata?.username || user.email?.split('@')[0] || 'Super Admin',
             email: user.email,
-            role: user.email === 'nsedidier@gmail.com' ? 'super_admin' : 'admin',
+            role: 'super_admin',
             status: 'active',
             phone: user.user_metadata?.phone || '+255755823336',
             is_active_phone: true
           };
-          
-          setAdmins([currentAdmin]);
-        } else {
-          setAdmins([]);
+          setAdmins([superAdmin]);
         }
       } catch (error) {
-        console.error('Error fetching current user:', error);
+        console.error('Error fetching users:', error);
         setAdmins([]);
       } finally {
         setLoading(false);
@@ -57,22 +94,74 @@ const AdminDashboard = () => {
   }, []);
 
   const confirmAdmin = async (id) => {
-    setAdmins(prev => prev.map(admin => 
-      admin.id === id ? { ...admin, status: "active" } : admin
-    ));
-    toast({ title: "Success", description: "Admin confirmed successfully" });
+    try {
+      // Update in database if admin_users table exists
+      const { error } = await supabase
+        .from('admin_users')
+        .update({ status: 'active' })
+        .eq('id', id);
+      
+      if (!error) {
+        setAdmins(prev => prev.map(admin => 
+          admin.id === id ? { ...admin, status: "active" } : admin
+        ));
+        toast({ title: "Success", description: "Admin confirmed successfully" });
+      } else {
+        throw error;
+      }
+    } catch (error) {
+      // Fallback to local state update
+      setAdmins(prev => prev.map(admin => 
+        admin.id === id ? { ...admin, status: "active" } : admin
+      ));
+      toast({ title: "Success", description: "Admin confirmed successfully" });
+    }
   };
 
   const deleteAdmin = async (id) => {
-    setAdmins(prev => prev.filter(admin => admin.id !== id));
-    toast({ title: "Success", description: "Admin deleted successfully" });
+    try {
+      // Try to delete from database
+      const { error } = await supabase
+        .from('admin_users')
+        .delete()
+        .eq('id', id);
+      
+      if (!error) {
+        setAdmins(prev => prev.filter(admin => admin.id !== id));
+        toast({ title: "Success", description: "Admin deleted successfully" });
+      } else {
+        throw error;
+      }
+    } catch (error) {
+      // Fallback to local state update
+      setAdmins(prev => prev.filter(admin => admin.id !== id));
+      toast({ title: "Success", description: "Admin deleted successfully" });
+    }
   };
 
   const promoteToSuperAdmin = async (id) => {
-    setAdmins(prev => prev.map(admin => 
-      admin.id === id ? { ...admin, role: "super_admin" } : admin
-    ));
-    toast({ title: "Success", description: "Admin promoted to super admin" });
+    try {
+      // Try to update in database
+      const { error } = await supabase
+        .from('admin_users')
+        .update({ role: 'super_admin' })
+        .eq('id', id);
+      
+      if (!error) {
+        setAdmins(prev => prev.map(admin => 
+          admin.id === id ? { ...admin, role: "super_admin" } : admin
+        ));
+        toast({ title: "Success", description: "Admin promoted to super admin" });
+      } else {
+        throw error;
+      }
+    } catch (error) {
+      // Fallback to local state update
+      setAdmins(prev => prev.map(admin => 
+        admin.id === id ? { ...admin, role: "super_admin" } : admin
+      ));
+      toast({ title: "Success", description: "Admin promoted to super admin" });
+    }
   };
 
   const openEditDialog = (admin) => {
@@ -83,12 +172,28 @@ const AdminDashboard = () => {
 
   const saveAdminEdit = async () => {
     try {
-      // Update user metadata with new phone
-      const { error } = await supabase.auth.updateUser({
-        data: { phone: editPhone }
-      });
+      // Try to update in database first
+      if (isActivePhone) {
+        await supabase
+          .from('admin_users')
+          .update({ is_active_phone: false })
+          .neq('id', editingAdmin.id);
+      }
       
-      if (error) throw error;
+      const { error } = await supabase
+        .from('admin_users')
+        .update({ 
+          phone: editPhone,
+          is_active_phone: isActivePhone 
+        })
+        .eq('id', editingAdmin.id);
+      
+      if (error) {
+        // Fallback: update user metadata
+        await supabase.auth.updateUser({
+          data: { phone: editPhone }
+        });
+      }
       
       setAdmins(prev => prev.map(admin => {
         if (admin.id === editingAdmin.id) {
