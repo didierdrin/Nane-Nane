@@ -13,35 +13,32 @@ const AdminDashboard = () => {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch real users from Supabase auth
+  // Get current user and set as admin
   useEffect(() => {
-    const fetchUsers = async () => {
+    const getCurrentUser = async () => {
       try {
-        const { data: { users }, error } = await supabase.auth.admin.listUsers();
+        const { data: { user } } = await supabase.auth.getUser();
         
-        if (error) {
-          console.error('Error fetching users:', error);
-          return;
+        if (user) {
+          const currentAdmin = {
+            id: user.id,
+            username: user.user_metadata?.username || user.email?.split('@')[0] || 'Admin',
+            email: user.email || 'No email',
+            role: user.email === 'nsedidier@gmail.com' ? 'super_admin' : 'admin',
+            status: 'active',
+            phone: user.user_metadata?.phone || '+255755823336'
+          };
+          
+          setAdmins([currentAdmin]);
         }
-
-        const formattedUsers = users.map(user => ({
-          id: user.id,
-          username: user.user_metadata?.username || user.email?.split('@')[0] || 'Unknown',
-          email: user.email || 'No email',
-          role: user.user_metadata?.role || 'admin',
-          status: user.email_confirmed_at ? 'active' : 'pending',
-          phone: user.user_metadata?.phone || null
-        }));
-        
-        setAdmins(formattedUsers);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching current user:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    getCurrentUser();
   }, []);
 
   const confirmAdmin = (id: number) => {

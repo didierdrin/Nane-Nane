@@ -27,18 +27,14 @@ const Shop = () => {
   const { content, isLoading: contentLoading } = useContent();
   const [adminPhoneNumber, setAdminPhoneNumber] = useState("+255755823336");
 
-  // Fetch admin phone number
+  // Fetch admin phone number from user metadata or use default
   useEffect(() => {
     const fetchAdminPhone = async () => {
       try {
-        const { data } = await supabase
-          .from('site_content')
-          .select('content')
-          .eq('id', 1)
-          .single();
+        const { data: { user } } = await supabase.auth.getUser();
         
-        if (data?.content?.adminPhone) {
-          setAdminPhoneNumber(data.content.adminPhone);
+        if (user?.user_metadata?.phone) {
+          setAdminPhoneNumber(user.user_metadata.phone);
         }
       } catch (error) {
         console.error('Error fetching admin phone:', error);
@@ -75,7 +71,7 @@ const Shop = () => {
     <>
       <Navbar />
       <main className=" pb-16">
-        <div className="mb-4 bg-gradient-to-b from-nanenane-900 to-nanenane-700 text-white py-16 pt-0"></div>
+        <div className="mb-4 bg-gradient-to-b from-nanenane-800 to-nanenane-700 text-white py-16 pt-0"></div>
 
         <section className="py-12">
           <div className="container-custom">
