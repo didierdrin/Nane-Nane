@@ -22,31 +22,50 @@ const AdminDashboard = () => {
   const [isActivePhone, setIsActivePhone] = useState(false);
   const { toast } = useToast();
 
-  // Function to register new authenticated user
-  const registerNewUser = async (user) => {
-    const newAdmin = {
-      id: user.id,
-      username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
-      email: user.email,
-      role: user.email === 'nsedidier@gmail.com' ? 'super_admin' : 'admin',
-      status: user.email === 'nsedidier@gmail.com' ? 'active' : 'pending',
-      phone: user.user_metadata?.phone || '+255755823336',
-      is_active_phone: user.email === 'nsedidier@gmail.com'
-    };
-
+  const addNewUser = async (email, username) => {
     try {
+      const newUser = {
+        id: crypto.randomUUID(),
+        username: username || email.split('@')[0],
+        email: email,
+        role: 'admin',
+        status: 'pending',
+        phone: '+255755823336',
+        is_active_phone: false
+      };
+
       const { error } = await supabase
         .from('admin_users')
-        .insert(newAdmin);
-      
+        .insert(newUser);
+
       if (!error) {
-        return newAdmin;
+        setAdmins(prev => [...prev, newUser]);
+        toast({ title: "Success", description: "User added successfully" });
       }
     } catch (error) {
-      console.log('User already exists or insert failed:', error);
+      toast({ title: "Error", description: "Failed to add user", variant: "destructive" });
     }
-    return newAdmin;
   };
+
+  const refreshUsers = async () => {
+    setLoading(true);
+    try {
+      const { data: adminUsers } = await supabase
+        .from('admin_users')
+        .select('*')
+        .order('created_at', { ascending: true });
+      
+      if (adminUsers) {
+        setAdmins(adminUsers);
+      }
+    } catch (error) {
+      console.error('Error refreshing users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   // Fetch all authenticated users including unconfirmed ones
   useEffect(() => {
@@ -73,27 +92,28 @@ const AdminDashboard = () => {
           return;
         }
 
-        // Super admin can see all users - get from admin_users table
+        // Super admin can see all users - try to get from admin_users table
         try {
           const { data: adminUsers, error } = await supabase
             .from('admin_users')
             .select('*')
             .order('created_at', { ascending: true });
 
-          if (error && error.code !== 'PGRST116') {
-            throw error;
+          if (adminUsers && adminUsers.length > 0) {
+            setAdmins(adminUsers);
+          } else {
+            // If no users in table or error, create current super admin entry
+            const superAdmin = {
+              id: user.id,
+              username: user.user_metadata?.username || user.email?.split('@')[0] || 'Super Admin',
+              email: user.email,
+              role: 'super_admin',
+              status: 'active',
+              phone: user.user_metadata?.phone || '+255755823336',
+              is_active_phone: true
+            };
+            setAdmins([superAdmin]);
           }
-
-          let allAdmins = adminUsers || [];
-
-          // Check if current user exists in admin_users table
-          const currentUserExists = allAdmins.find(admin => admin.id === user.id);
-          if (!currentUserExists) {
-            const newAdmin = await registerNewUser(user);
-            allAdmins.push(newAdmin);
-          }
-
-          setAdmins(allAdmins);
         } catch (dbError) {
           console.error('Error fetching users:', dbError);
           // Fallback: show current super admin only
@@ -119,49 +139,15 @@ const AdminDashboard = () => {
     fetchAdmins();
   }, []);
 
-  // Listen for auth state changes to register new users
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Check if this is a new user not in admin_users table
-        const { data: existingUser } = await supabase
-          .from('admin_users')
-          .select('id')
-          .eq('id', session.user.id)
-          .single();
 
-        if (!existingUser) {
-          // Register new user
-          const newAdmin = await registerNewUser(session.user);
-          
-          // Update admins list if current user is super admin
-          const { data: { user: currentUser } } = await supabase.auth.getUser();
-          if (currentUser?.email === 'nsedidier@gmail.com') {
-            setAdmins(prev => [...prev, newAdmin]);
-          }
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const confirmAdmin = async (id) => {
     try {
-      const adminToConfirm = admins.find(admin => admin.id === id);
-      
-      // Try to update existing record or insert new one
+      // Simply update status to active
       const { error } = await supabase
         .from('admin_users')
-        .upsert({
-          id: adminToConfirm.id,
-          username: adminToConfirm.username,
-          email: adminToConfirm.email,
-          role: adminToConfirm.role,
-          status: 'active',
-          phone: adminToConfirm.phone,
-          is_active_phone: adminToConfirm.is_active_phone
-        });
+        .update({ status: 'active' })
+        .eq('id', id);
       
       if (!error) {
         setAdmins(prev => prev.map(admin => 
@@ -394,9 +380,14 @@ const AdminDashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Users className="mr-2 h-5 w-5" />
-              Admin Management
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Users className="mr-2 h-5 w-5" />
+                Admin Management
+              </div>
+              <Button size="sm" onClick={refreshUsers} disabled={loading}>
+                Refresh
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
