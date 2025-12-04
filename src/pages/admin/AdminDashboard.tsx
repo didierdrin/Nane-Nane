@@ -47,30 +47,39 @@ const AdminDashboard = () => {
           return;
         }
 
-        // Super admin can see all users - try to get from admin_users table first
+        // Super admin can see all users - fetch all authenticated users
         try {
-          const { data: adminUsers, error } = await supabase
-            .from('admin_users')
-            .select('*')
-            .order('created_at', { ascending: true });
-
-          if (adminUsers && adminUsers.length > 0) {
-            setAdmins(adminUsers);
-          } else {
-            // Fallback: show current super admin
-            const superAdmin = {
-              id: user.id,
-              username: user.user_metadata?.username || user.email?.split('@')[0] || 'Super Admin',
-              email: user.email,
-              role: 'super_admin',
-              status: 'active',
-              phone: user.user_metadata?.phone || '+255755823336',
-              is_active_phone: true
-            };
-            setAdmins([superAdmin]);
+          // Get all authenticated users from Supabase auth
+          const { data: { users }, error: authError } = await supabase.auth.admin.listUsers();
+          
+          if (authError) {
+            throw authError;
           }
+
+          // Get admin_users data to merge with auth users
+          const { data: adminUsers } = await supabase
+            .from('admin_users')
+            .select('*');
+
+          // Create admin list from all authenticated users
+          const allAdmins = users.map(authUser => {
+            const adminData = adminUsers?.find(admin => admin.id === authUser.id);
+            return {
+              id: authUser.id,
+              username: authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'User',
+              email: authUser.email,
+              role: authUser.email === 'nsedidier@gmail.com' ? 'super_admin' : (adminData?.role || 'admin'),
+              status: adminData?.status || 'pending',
+              phone: adminData?.phone || authUser.user_metadata?.phone || '+255755823336',
+              is_active_phone: adminData?.is_active_phone || false,
+              created_at: authUser.created_at
+            };
+          });
+
+          setAdmins(allAdmins);
         } catch (dbError) {
-          // If admin_users table doesn't exist, show current super admin only
+          console.error('Error fetching users from auth:', dbError);
+          // Fallback: show current super admin only
           const superAdmin = {
             id: user.id,
             username: user.user_metadata?.username || user.email?.split('@')[0] || 'Super Admin',
