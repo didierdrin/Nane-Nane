@@ -41,15 +41,21 @@ const Shop = () => {
         
         if (activeAdmin?.phone) {
           setAdminPhoneNumber(activeAdmin.phone);
-        } else {
-          // Fallback to current user's phone or default
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user?.user_metadata?.phone) {
-            setAdminPhoneNumber(user.user_metadata.phone);
-          }
+          return;
         }
       } catch (error) {
-        console.error('Error fetching admin phone:', error);
+        console.log('admin_users table not found, using fallback');
+      }
+      
+      // Fallback: try current user's phone or use default
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.user_metadata?.phone) {
+          setAdminPhoneNumber(user.user_metadata.phone);
+        }
+      } catch (error) {
+        console.error('Error fetching user phone:', error);
+        // Keep default phone number
       }
     };
     

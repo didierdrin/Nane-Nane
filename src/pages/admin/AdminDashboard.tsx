@@ -22,61 +22,24 @@ const AdminDashboard = () => {
   const [isActivePhone, setIsActivePhone] = useState(false);
   const { toast } = useToast();
 
-  // Fetch all users from a custom admin_users table
+  // Fetch all users from admin_users table
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        // First, get current user to check permissions
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-          setLoading(false);
-          return;
-        }
-
-        // Try to fetch from admin_users table, if it doesn't exist, create mock data
         const { data: adminUsers, error } = await supabase
           .from('admin_users')
           .select('*')
           .order('created_at', { ascending: true });
 
-        if (error && error.code === '42P01') {
-          // Table doesn't exist, create mock data including current user
-          const mockAdmins = [
-            {
-              id: user.id,
-              username: user.user_metadata?.username || user.email?.split('@')[0] || 'Admin',
-              email: user.email,
-              role: user.email === 'nsedidier@gmail.com' ? 'super_admin' : 'admin',
-              status: 'active',
-              phone: user.user_metadata?.phone || '+255755823336',
-              is_active_phone: true
-            },
-            {
-              id: 'pending-1',
-              username: 'john_doe',
-              email: 'john@example.com',
-              role: 'admin',
-              status: 'pending',
-              phone: '+255700000001',
-              is_active_phone: false
-            },
-            {
-              id: 'pending-2',
-              username: 'jane_smith',
-              email: 'jane@example.com',
-              role: 'admin',
-              status: 'pending',
-              phone: '+255700000002',
-              is_active_phone: false
-            }
-          ];
-          setAdmins(mockAdmins);
-        } else if (adminUsers) {
-          setAdmins(adminUsers);
+        if (error) {
+          console.error('Database error:', error);
+          setAdmins([]);
+        } else {
+          setAdmins(adminUsers || []);
         }
       } catch (error) {
         console.error('Error fetching admins:', error);
+        setAdmins([]);
       } finally {
         setLoading(false);
       }
@@ -87,6 +50,13 @@ const AdminDashboard = () => {
 
   const confirmAdmin = async (id) => {
     try {
+      const { error } = await supabase
+        .from('admin_users')
+        .update({ status: 'active' })
+        .eq('id', id);
+      
+      if (error) throw error;
+      
       setAdmins(prev => prev.map(admin => 
         admin.id === id ? { ...admin, status: "active" } : admin
       ));
@@ -98,6 +68,13 @@ const AdminDashboard = () => {
 
   const deleteAdmin = async (id) => {
     try {
+      const { error } = await supabase
+        .from('admin_users')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
       setAdmins(prev => prev.filter(admin => admin.id !== id));
       toast({ title: "Success", description: "Admin deleted successfully" });
     } catch (error) {
@@ -107,6 +84,13 @@ const AdminDashboard = () => {
 
   const promoteToSuperAdmin = async (id) => {
     try {
+      const { error } = await supabase
+        .from('admin_users')
+        .update({ role: 'super_admin' })
+        .eq('id', id);
+      
+      if (error) throw error;
+      
       setAdmins(prev => prev.map(admin => 
         admin.id === id ? { ...admin, role: "super_admin" } : admin
       ));
@@ -124,6 +108,25 @@ const AdminDashboard = () => {
 
   const saveAdminEdit = async () => {
     try {
+      // If setting as active phone, deactivate others first
+      if (isActivePhone) {
+        await supabase
+          .from('admin_users')
+          .update({ is_active_phone: false })
+          .neq('id', editingAdmin.id);
+      }
+      
+      // Update the current admin
+      const { error } = await supabase
+        .from('admin_users')
+        .update({ 
+          phone: editPhone,
+          is_active_phone: isActivePhone 
+        })
+        .eq('id', editingAdmin.id);
+      
+      if (error) throw error;
+      
       setAdmins(prev => prev.map(admin => {
         if (admin.id === editingAdmin.id) {
           return {
@@ -132,7 +135,6 @@ const AdminDashboard = () => {
             is_active_phone: isActivePhone
           };
         }
-        // If this admin is being set as active, deactivate others
         if (isActivePhone && admin.is_active_phone) {
           return { ...admin, is_active_phone: false };
         }
