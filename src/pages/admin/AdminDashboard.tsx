@@ -47,38 +47,45 @@ const AdminDashboard = () => {
           return;
         }
 
-        // Super admin can see all users - fetch all authenticated users
+        // Super admin can see all users - get from admin_users table and add current user if not exists
         try {
-          // Get all authenticated users from Supabase auth
-          const { data: { users }, error: authError } = await supabase.auth.admin.listUsers();
-          
-          if (authError) {
-            throw authError;
+          const { data: adminUsers, error } = await supabase
+            .from('admin_users')
+            .select('*')
+            .order('created_at', { ascending: true });
+
+          if (error && error.code !== 'PGRST116') {
+            throw error;
           }
 
-          // Get admin_users data to merge with auth users
-          const { data: adminUsers } = await supabase
-            .from('admin_users')
-            .select('*');
+          let allAdmins = adminUsers || [];
 
-          // Create admin list from all authenticated users
-          const allAdmins = users.map(authUser => {
-            const adminData = adminUsers?.find(admin => admin.id === authUser.id);
-            return {
-              id: authUser.id,
-              username: authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'User',
-              email: authUser.email,
-              role: authUser.email === 'nsedidier@gmail.com' ? 'super_admin' : (adminData?.role || 'admin'),
-              status: adminData?.status || 'pending',
-              phone: adminData?.phone || authUser.user_metadata?.phone || '+255755823336',
-              is_active_phone: adminData?.is_active_phone || false,
-              created_at: authUser.created_at
+          // Ensure current user exists in admin_users table
+          const currentUserExists = allAdmins.find(admin => admin.id === user.id);
+          if (!currentUserExists) {
+            const newAdmin = {
+              id: user.id,
+              username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+              email: user.email,
+              role: user.email === 'nsedidier@gmail.com' ? 'super_admin' : 'admin',
+              status: user.email === 'nsedidier@gmail.com' ? 'active' : 'pending',
+              phone: user.user_metadata?.phone || '+255755823336',
+              is_active_phone: user.email === 'nsedidier@gmail.com'
             };
-          });
+
+            // Try to insert into database
+            try {
+              await supabase.from('admin_users').insert(newAdmin);
+              allAdmins.push(newAdmin);
+            } catch (insertError) {
+              // If insert fails, just add to local state
+              allAdmins.push(newAdmin);
+            }
+          }
 
           setAdmins(allAdmins);
         } catch (dbError) {
-          console.error('Error fetching users from auth:', dbError);
+          console.error('Error fetching users:', dbError);
           // Fallback: show current super admin only
           const superAdmin = {
             id: user.id,
@@ -104,11 +111,20 @@ const AdminDashboard = () => {
 
   const confirmAdmin = async (id) => {
     try {
-      // Update in database if admin_users table exists
+      const adminToConfirm = admins.find(admin => admin.id === id);
+      
+      // Try to update existing record or insert new one
       const { error } = await supabase
         .from('admin_users')
-        .update({ status: 'active' })
-        .eq('id', id);
+        .upsert({
+          id: adminToConfirm.id,
+          username: adminToConfirm.username,
+          email: adminToConfirm.email,
+          role: adminToConfirm.role,
+          status: 'active',
+          phone: adminToConfirm.phone,
+          is_active_phone: adminToConfirm.is_active_phone
+        });
       
       if (!error) {
         setAdmins(prev => prev.map(admin => 
