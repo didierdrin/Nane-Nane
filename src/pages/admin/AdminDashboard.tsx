@@ -22,6 +22,32 @@ const AdminDashboard = () => {
   const [isActivePhone, setIsActivePhone] = useState(false);
   const { toast } = useToast();
 
+  // Function to register new authenticated user
+  const registerNewUser = async (user) => {
+    const newAdmin = {
+      id: user.id,
+      username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
+      email: user.email,
+      role: user.email === 'nsedidier@gmail.com' ? 'super_admin' : 'admin',
+      status: user.email === 'nsedidier@gmail.com' ? 'active' : 'pending',
+      phone: user.user_metadata?.phone || '+255755823336',
+      is_active_phone: user.email === 'nsedidier@gmail.com'
+    };
+
+    try {
+      const { error } = await supabase
+        .from('admin_users')
+        .insert(newAdmin);
+      
+      if (!error) {
+        return newAdmin;
+      }
+    } catch (error) {
+      console.log('User already exists or insert failed:', error);
+    }
+    return newAdmin;
+  };
+
   // Fetch all authenticated users including unconfirmed ones
   useEffect(() => {
     const fetchAdmins = async () => {
@@ -47,7 +73,7 @@ const AdminDashboard = () => {
           return;
         }
 
-        // Super admin can see all users - get from admin_users table and add current user if not exists
+        // Super admin can see all users - get from admin_users table
         try {
           const { data: adminUsers, error } = await supabase
             .from('admin_users')
@@ -60,27 +86,11 @@ const AdminDashboard = () => {
 
           let allAdmins = adminUsers || [];
 
-          // Ensure current user exists in admin_users table
+          // Check if current user exists in admin_users table
           const currentUserExists = allAdmins.find(admin => admin.id === user.id);
           if (!currentUserExists) {
-            const newAdmin = {
-              id: user.id,
-              username: user.user_metadata?.username || user.email?.split('@')[0] || 'User',
-              email: user.email,
-              role: user.email === 'nsedidier@gmail.com' ? 'super_admin' : 'admin',
-              status: user.email === 'nsedidier@gmail.com' ? 'active' : 'pending',
-              phone: user.user_metadata?.phone || '+255755823336',
-              is_active_phone: user.email === 'nsedidier@gmail.com'
-            };
-
-            // Try to insert into database
-            try {
-              await supabase.from('admin_users').insert(newAdmin);
-              allAdmins.push(newAdmin);
-            } catch (insertError) {
-              // If insert fails, just add to local state
-              allAdmins.push(newAdmin);
-            }
+            const newAdmin = await registerNewUser(user);
+            allAdmins.push(newAdmin);
           }
 
           setAdmins(allAdmins);
@@ -107,6 +117,33 @@ const AdminDashboard = () => {
     };
 
     fetchAdmins();
+  }, []);
+
+  // Listen for auth state changes to register new users
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Check if this is a new user not in admin_users table
+        const { data: existingUser } = await supabase
+          .from('admin_users')
+          .select('id')
+          .eq('id', session.user.id)
+          .single();
+
+        if (!existingUser) {
+          // Register new user
+          const newAdmin = await registerNewUser(session.user);
+          
+          // Update admins list if current user is super admin
+          const { data: { user: currentUser } } = await supabase.auth.getUser();
+          if (currentUser?.email === 'nsedidier@gmail.com') {
+            setAdmins(prev => [...prev, newAdmin]);
+          }
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const confirmAdmin = async (id) => {
