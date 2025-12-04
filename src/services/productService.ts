@@ -36,10 +36,22 @@ export const addProductToApi = async (product: Omit<Product, "id" | "created_at"
     // Continue with product addition using admin authentication bypass
   }
   
+  // Create payload, excluding weight if it doesn't exist in DB yet
+  const productPayload = {
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    image: product.image,
+    description: product.description,
+    whatsapp_message: product.whatsapp_message,
+    tag: product.tag || null,
+    ...(product.weight && { weight: product.weight })
+  };
+  
   // Insert the new product
   const { data, error } = await supabase
     .from("products")
-    .insert(product)
+    .insert(productPayload)
     .select();
 
   if (error) {
@@ -70,7 +82,8 @@ export const updateProductInApi = async (product: Product): Promise<Product> => 
     image: product.image,
     description: product.description,
     whatsapp_message: product.whatsapp_message,
-    tag: product.tag || null
+    tag: product.tag || null,
+    ...(product.weight && { weight: product.weight })
   };
   
   console.log("Update payload:", updatePayload);

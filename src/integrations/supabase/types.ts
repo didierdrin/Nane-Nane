@@ -20,6 +20,7 @@ export type Database = {
           price: string
           tag: string | null
           updated_at: string
+          weight: string | null
           whatsapp_message: string
         }
         Insert: {
@@ -32,6 +33,7 @@ export type Database = {
           price: string
           tag?: string | null
           updated_at?: string
+          weight?: string | null
           whatsapp_message: string
         }
         Update: {
@@ -44,6 +46,7 @@ export type Database = {
           price?: string
           tag?: string | null
           updated_at?: string
+          weight?: string | null
           whatsapp_message?: string
         }
         Relationships: []
