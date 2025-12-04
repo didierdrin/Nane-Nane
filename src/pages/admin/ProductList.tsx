@@ -421,7 +421,7 @@ const ProductList = () => {
                           </div>
                         </TableCell>
                         <TableCell>{product.weight || 'N/A'}</TableCell>
-                        <TableCell>${product.price}</TableCell>
+                        <TableCell>TZS {Number(product.price).toLocaleString()}</TableCell>
                         <TableCell>
                           {disabled ? (
                             <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">
