@@ -51,7 +51,21 @@ const defaultContent = {
       waste: "To create value from waste by transforming fish by-products into food, fertilizer, and exportable components like bondo.",
       leadership: "To scale a trusted regional brand that combines aquaculture, innovation, and social impact—becoming East Africa's leading integrated fish platform by 2035."
     },
-    story: "Nane Nane was founded in January 2024 in Lake Victoria, Tanzania, with 3 tilapia cages that produced 11.2 tonnes of tilapia, becoming profitable on its first year of operations.\n\nBuilding on strong market insights, government relationships and team expertise, Nane Nane is now a vertically integrated fish‑supply business—aggregating catches from artisanal fishermen, processing fillets and by‑products, and operating branded retail outlets.\n\nWe saw a gap in the fish distribution, and we decided to capitalize on this opportunity while maintaining our fish cage farming. Our seamless end‑to‑end cold chain, digital technologies, and high‑margin by‑product lines (e.g., fish maw) differentiate us in the market."
+    story: "Nane Nane was founded in January 2024 in Lake Victoria, Tanzania, with 3 tilapia cages that produced 11.2 tonnes of tilapia, becoming profitable on its first year of operations.\n\nBuilding on strong market insights, government relationships and team expertise, Nane Nane is now a vertically integrated fish‑supply business—aggregating catches from artisanal fishermen, processing fillets and by‑products, and operating branded retail outlets.\n\nWe saw a gap in the fish distribution, and we decided to capitalize on this opportunity while maintaining our fish cage farming. Our seamless end‑to‑end cold chain, digital technologies, and high‑margin by‑product lines (e.g., fish maw) differentiate us in the market.",
+    images: [
+      {
+        url: "https://i.ibb.co/99C7q1CN/IMG-20250505-WA0023.jpg",
+        alt: "Fish farming"
+      },
+      {
+        url: "https://i.ibb.co/1YwqyPwB/IMG-20250505-WA0019.jpg",
+        alt: "Processing facility"
+      },
+      {
+        url: "https://i.ibb.co/KjdNBCzL/IMG-20250505-WA0030.jpg",
+        alt: "Community impact"
+      }
+    ]
   },
   contact: {
     subtitle: "Have questions about our fish products, services, or partnership opportunities? Get in touch with the Nane Nane team - we're here to help!",
@@ -440,6 +454,32 @@ const ContentManagement = () => {
                     onChange={(e) => updateField('about.story', e.target.value)}
                     rows={8}
                   />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mt-6 mb-4">Gallery Images</h3>
+                  <div className="space-y-4">
+                    {(content.about.images || defaultContent.about.images).map((image, index) => (
+                      <div key={index} className="grid gap-2 border p-4 rounded-md">
+                        <div className="font-medium text-sm text-gray-500">Image {index + 1}</div>
+                        <div>
+                          <Label>Image URL</Label>
+                          <Input 
+                            value={image.url} 
+                            onChange={(e) => updateArrayField('about.images', index, 'url', e.target.value)}
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <div>
+                          <Label>Alt Text</Label>
+                          <Input 
+                            value={image.alt} 
+                            onChange={(e) => updateArrayField('about.images', index, 'alt', e.target.value)}
+                            placeholder="Description of image"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
