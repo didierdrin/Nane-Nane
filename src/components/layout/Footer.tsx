@@ -27,7 +27,7 @@ const Footer = () => {
       <div className="container-custom pt-16 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
-          <div className="md:col-span-1">
+          <div className="md:col-span-3">
             <h2 className="text-2xl font-bold mb-4">
               NANE<span className="text-lake-400">NANE</span>
             </h2>

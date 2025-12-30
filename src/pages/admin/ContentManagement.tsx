@@ -132,7 +132,8 @@ const defaultContent = {
           "Provides income to local communities",
           "Available in various sizes with delivery options"
         ],
-        buttonText: "Order Fresh Tilapia Fish"
+        buttonText: "Order Fresh Tilapia Fish",
+        image: "https://www.globalseafood.org/wp-content/uploads/2018/12/STONEHAM-tilapia-Pic-0.jpg"
       },
       nilePerch: {
         title: "Fresh Nile Perch",
@@ -143,7 +144,8 @@ const defaultContent = {
           "Rich in protein and omega-3 fatty acids",
           "Supports sustainable fishing practices"
         ],
-        buttonText: "Order Fresh Nile Perch"
+        buttonText: "Order Fresh Nile Perch",
+        image: "https://a-z-animals.com/media/2022/06/shutterstock_2100233851-1024x614.jpg"
       }
     }
   }, 
@@ -955,6 +957,117 @@ const ContentManagement = () => {
                         </div>
                     </div>
                   ))}
+                </div>
+                
+                <h3 className="text-lg font-semibold mt-6 mb-4">Product Images</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2 border p-4 rounded-md">
+                    <div className="font-medium text-sm text-gray-500">Tilapia Image</div>
+                    <div>
+                      <Label>Image URL</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          value={content.explore.products.tilapia.image || defaultContent.explore.products.tilapia.image} 
+                          onChange={(e) => updateField('explore.products.tilapia.image', e.target.value)}
+                          placeholder="https://..."
+                          className="flex-1"
+                        />
+                        <div className="relative">
+                          <Input
+                            type="file"
+                            id="tilapia-image-upload"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              try {
+                                setSaving(true);
+                                const fileExt = file.name.split('.').pop();
+                                const fileName = `content/tilapia-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                                const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
+                                if (uploadError) throw uploadError;
+                                const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+                                updateField('explore.products.tilapia.image', publicUrl);
+                                setMessage({ type: 'success', text: 'Image uploaded successfully!' });
+                                setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+                              } catch (error) {
+                                console.error('Error uploading image:', error);
+                                setMessage({ type: 'error', text: 'Failed to upload image' });
+                              } finally {
+                                setSaving(false);
+                              }
+                            }}
+                            disabled={saving}
+                          />
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="icon"
+                            onClick={() => document.getElementById('tilapia-image-upload')?.click()}
+                            disabled={saving}
+                            title="Upload from device"
+                          >
+                            <Upload className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid gap-2 border p-4 rounded-md">
+                    <div className="font-medium text-sm text-gray-500">Nile Perch Image</div>
+                    <div>
+                      <Label>Image URL</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          value={content.explore.products.nilePerch.image || defaultContent.explore.products.nilePerch.image} 
+                          onChange={(e) => updateField('explore.products.nilePerch.image', e.target.value)}
+                          placeholder="https://..."
+                          className="flex-1"
+                        />
+                        <div className="relative">
+                          <Input
+                            type="file"
+                            id="nileperch-image-upload"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              try {
+                                setSaving(true);
+                                const fileExt = file.name.split('.').pop();
+                                const fileName = `content/nileperch-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                                const { error: uploadError } = await supabase.storage.from('product-images').upload(fileName, file);
+                                if (uploadError) throw uploadError;
+                                const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+                                updateField('explore.products.nilePerch.image', publicUrl);
+                                setMessage({ type: 'success', text: 'Image uploaded successfully!' });
+                                setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+                              } catch (error) {
+                                console.error('Error uploading image:', error);
+                                setMessage({ type: 'error', text: 'Failed to upload image' });
+                              } finally {
+                                setSaving(false);
+                              }
+                            }}
+                            disabled={saving}
+                          />
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="icon"
+                            onClick={() => document.getElementById('nileperch-image-upload')?.click()}
+                            disabled={saving}
+                            title="Upload from device"
+                          >
+                            <Upload className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
