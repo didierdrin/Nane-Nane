@@ -106,7 +106,13 @@ const defaultContent = {
       ]
     },
     about: {
-      subtitle: "Nane Nane is a Tanzanian-led, tech-enabled fish company solving protein deficiency and post-harvest loss across East Africa. We operate an integrated fish value chain—from cage-based fish farming and cold-chain aggregation, to value-added processing and smart distribution. Through our sustainable practices, we empower fishing communities, increase incomes, and deliver fresh, affordable, high-quality fish to urban households, retailers, and hospitality businesses.\n\nOur model blends ethical aquaculture & sustainable aggregation from fishers, clean technology, and circular economy innovation—turning waste into value and fish into hope. Fresh from the Lake. Made for Your Plate. Empowering communities, one fish at a time."
+      subtitle: "Nane Nane is a Tanzanian-led, tech-enabled fish company solving protein deficiency and post-harvest loss across East Africa. We operate an integrated fish value chain—from cage-based fish farming and cold-chain aggregation, to value-added processing and smart distribution. Through our sustainable practices, we empower fishing communities, increase incomes, and deliver fresh, affordable, high-quality fish to urban households, retailers, and hospitality businesses.\n\nOur model blends ethical aquaculture & sustainable aggregation from fishers, clean technology, and circular economy innovation—turning waste into value and fish into hope. Fresh from the Lake. Made for Your Plate. Empowering communities, one fish at a time.",
+      images: [
+        { url: "https://i.ibb.co/99C7q1CN/IMG-20250505-WA0023.jpg", alt: "Fish farming operations" },
+        { url: "/lovable-uploads/f37b722f-f29c-47a0-bb56-f978b10828d6.png", alt: "Cold chain facility" },
+        { url: "/lovable-uploads/5e9aa77d-45b3-43b3-a5d5-dd89952924d1.png", alt: "Processing facility" },
+        { url: "https://i.ibb.co/1YwqyPwB/IMG-20250505-WA0019.jpg", alt: "Distribution network" }
+      ]
     },
     impact: {
       subtitle: "Through our integrated fish value chain, we're creating sustainable impact in Tanzania by increasing incomes, creating jobs, and reducing food waste.",
@@ -896,6 +902,57 @@ const ContentManagement = () => {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <h3 className="text-lg font-semibold mt-6 mb-4">About Preview Images</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {(content.explore.about.images || defaultContent.explore.about.images).map((image, index) => (
+                    <div key={index} className="grid gap-2 border p-4 rounded-md">
+                      <div className="font-medium text-sm text-gray-500">Image {index + 1}</div>
+                      <div>
+                        <Label>Image URL</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            value={image.url} 
+                            onChange={(e) => updateArrayField('explore.about.images', index, 'url', e.target.value)}
+                            placeholder="https://..."
+                            className="flex-1"
+                          />
+                          <div className="relative">
+                            <Input
+                              type="file"
+                              id={`explore-about-image-upload-${index}`}
+                              className="hidden"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleImageUpload(file, 'explore.about.images', index);
+                              }}
+                              disabled={saving}
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="icon"
+                              onClick={() => document.getElementById(`explore-about-image-upload-${index}`)?.click()}
+                              disabled={saving}
+                              title="Upload from device"
+                            >
+                              <Upload className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                          <Label>Alt Text</Label>
+                          <Input 
+                            value={image.alt} 
+                            onChange={(e) => updateArrayField('explore.about.images', index, 'alt', e.target.value)}
+                            placeholder="Description"
+                          />
+                        </div>
                     </div>
                   ))}
                 </div>
