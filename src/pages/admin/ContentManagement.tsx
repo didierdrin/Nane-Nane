@@ -90,7 +90,20 @@ const defaultContent = {
   },
   explore: {
     hero: {
-      title: "Fresh from Lake Victoria\nMade for Your Plate"
+      title: "Fresh from Lake Victoria\nMade for Your Plate",
+      images: [
+        { url: "https://i.ibb.co/xth1LYzj/IMG-20250505-WA0038.jpg" },
+        { url: "https://i.ibb.co/6JZfVVS9/IMG-20250505-WA0035.jpg" },
+        { url: "https://i.ibb.co/1fQv2dxR/IMG-20250505-WA0039.jpg" },
+        { url: "https://i.ibb.co/mCSQPnd1/IMG-20250505-WA0034.jpg" },
+        { url: "https://i.ibb.co/xth1LYzj/IMG-20250505-WA0036.jpg" },
+        { url: "https://i.ibb.co/6JZfVVS9/IMG-20250505-WA0030.jpg" },
+        { url: "https://i.ibb.co/1fQv2dxR/IMG-20250505-WA0031.jpg" },
+        { url: "https://i.ibb.co/mCSQPnd1/IMG-20250505-WA0029.jpg" },
+        { url: "https://i.ibb.co/xth1LYzj/IMG-20250505-WA0027.jpg" },
+        { url: "https://i.ibb.co/6JZfVVS9/IMG-20250505-WA0018.jpg" },
+        { url: "https://i.ibb.co/1fQv2dxR/IMG-20250505-WA0019.jpg" }
+      ]
     },
     about: {
       subtitle: "Nane Nane is a Tanzanian-led, tech-enabled fish company solving protein deficiency and post-harvest loss across East Africa. We operate an integrated fish value chain—from cage-based fish farming and cold-chain aggregation, to value-added processing and smart distribution. Through our sustainable practices, we empower fishing communities, increase incomes, and deliver fresh, affordable, high-quality fish to urban households, retailers, and hospitality businesses.\n\nOur model blends ethical aquaculture & sustainable aggregation from fishers, clean technology, and circular economy innovation—turning waste into value and fish into hope. Fresh from the Lake. Made for Your Plate. Empowering communities, one fish at a time."
@@ -264,13 +277,14 @@ const ContentManagement = () => {
     });
   };
 
-  const handleImageUpload = async (file: File, index: number) => {
+  const handleImageUpload = async (file: File, path: string, index: number) => {
     if (!file) return;
 
     try {
       setSaving(true);
       const fileExt = file.name.split('.').pop();
-      const fileName = `content/about-${index}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const safePath = path.replace(/\./g, '-');
+      const fileName = `content/${safePath}-${index}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('product-images')
@@ -284,7 +298,7 @@ const ContentManagement = () => {
         .from('product-images')
         .getPublicUrl(fileName);
 
-      updateArrayField('about.images', index, 'url', publicUrl);
+      updateArrayField(path, index, 'url', publicUrl);
       setMessage({ type: 'success', text: 'Image uploaded successfully!' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     } catch (error) {
@@ -534,7 +548,7 @@ const ContentManagement = () => {
                                 accept="image/*"
                                 onChange={(e) => {
                                   const file = e.target.files?.[0];
-                                  if (file) handleImageUpload(file, index);
+                                  if (file) handleImageUpload(file, 'about.images', index);
                                 }}
                                 disabled={saving}
                               />
@@ -842,6 +856,48 @@ const ContentManagement = () => {
                     value={content.explore.products.nilePerch.buttonText}
                     onChange={(e) => updateField('explore.products.nilePerch.buttonText', e.target.value)}
                   />
+                </div>
+                <h3 className="text-lg font-semibold mt-6 mb-4">Hero Slideshow Images</h3>
+                <div className="space-y-4">
+                  {(content.explore.hero.images || defaultContent.explore.hero.images).map((image, index) => (
+                    <div key={index} className="grid gap-2 border p-4 rounded-md">
+                      <div className="font-medium text-sm text-gray-500">Image {index + 1}</div>
+                      <div>
+                        <Label>Image URL</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            value={image.url} 
+                            onChange={(e) => updateArrayField('explore.hero.images', index, 'url', e.target.value)}
+                            placeholder="https://..."
+                            className="flex-1"
+                          />
+                          <div className="relative">
+                            <Input
+                              type="file"
+                              id={`explore-image-upload-${index}`}
+                              className="hidden"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleImageUpload(file, 'explore.hero.images', index);
+                              }}
+                              disabled={saving}
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              size="icon"
+                              onClick={() => document.getElementById(`explore-image-upload-${index}`)?.click()}
+                              disabled={saving}
+                              title="Upload from device"
+                            >
+                              <Upload className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
