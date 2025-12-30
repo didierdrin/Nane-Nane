@@ -229,9 +229,34 @@ const ContentManagement = () => {
       const newContent = JSON.parse(JSON.stringify(prev));
       const keys = path.split('.');
       let current = newContent;
+      let defaultCurrent = defaultContent;
       
       for (let i = 0; i < keys.length; i++) {
-        current = current[keys[i]];
+        const key = keys[i];
+        
+        // If the path doesn't exist in the current content, 
+        // try to initialize it from defaultContent
+        if (!current[key]) {
+          if (defaultCurrent && defaultCurrent[key]) {
+             // Deep copy from default to avoid reference issues
+             current[key] = JSON.parse(JSON.stringify(defaultCurrent[key]));
+          } else {
+             // Fallback if not in default (shouldn't happen for known paths)
+             current[key] = i === keys.length - 1 ? [] : {};
+          }
+        }
+        
+        current = current[key];
+        if (defaultCurrent) defaultCurrent = defaultCurrent[key];
+      }
+      
+      // Ensure the specific item at index exists
+      if (!current[index]) {
+         if (defaultCurrent && defaultCurrent[index]) {
+             current[index] = JSON.parse(JSON.stringify(defaultCurrent[index]));
+         } else {
+             current[index] = {};
+         }
       }
       
       current[index][field] = value;
