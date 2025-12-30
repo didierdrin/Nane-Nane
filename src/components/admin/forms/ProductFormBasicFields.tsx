@@ -8,6 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect, useState } from "react";
+import { Category, fetchCategoriesFromApi } from "@/services/categoryService";
 
 interface ProductFormBasicFieldsProps {
   name: string;
@@ -30,6 +32,20 @@ const ProductFormBasicFields = ({
   onChange, 
   onSelectChange 
 }: ProductFormBasicFieldsProps) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await fetchCategoriesFromApi();
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+      }
+    };
+    loadCategories();
+  }, []);
+
   return (
     <div className="space-y-4">
       <div>
@@ -58,9 +74,18 @@ const ProductFormBasicFields = ({
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="fish">Fish Products</SelectItem>
-            <SelectItem value="inputs">Nile Perch</SelectItem>
-            {/* <SelectItem value="investment">Investment Opportunities</SelectItem> */}
+            {categories.length > 0 ? (
+              categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.slug}>
+                  {cat.name}
+                </SelectItem>
+              ))
+            ) : (
+              <>
+                <SelectItem value="fish">Fish Products</SelectItem>
+                <SelectItem value="inputs">Nile Perch</SelectItem>
+              </>
+            )}
           </SelectContent>
         </Select>
       </div>

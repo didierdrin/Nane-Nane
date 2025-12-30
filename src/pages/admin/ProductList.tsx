@@ -41,6 +41,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Category, fetchCategoriesFromApi, addCategoryToApi, deleteCategoryFromApi } from "@/services/categoryService";
+
 const ProductList = () => {
   const { 
     products, 
@@ -52,6 +63,10 @@ const ProductList = () => {
     toggleProductStatus 
   } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [deleteInProgress, setDeleteInProgress] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [deletingAll, setDeletingAll] = useState(false);
@@ -66,6 +81,66 @@ const ProductList = () => {
       setProductsLoaded(true);
     }
   }, [products]);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const data = await fetchCategoriesFromApi();
+      setCategories(data);
+    } catch (error) {
+      console.error("Failed to load categories:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load categories",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    
+    setIsAddingCategory(true);
+    try {
+      const newCategory = await addCategoryToApi(newCategoryName);
+      setCategories([...categories, newCategory]);
+      setNewCategoryName("");
+      toast({
+        title: "Success",
+        description: "Category added successfully",
+      });
+    } catch (error) {
+      console.error("Error adding category:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add category",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAddingCategory(false);
+    }
+  };
+
+  const handleDeleteCategory = async (id: number) => {
+    try {
+      await deleteCategoryFromApi(id);
+      setCategories(categories.filter(c => c.id !== id));
+      toast({
+        title: "Success",
+        description: "Category deleted",
+      });
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete category",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleRefresh = async () => {
     try {
@@ -218,16 +293,16 @@ const ProductList = () => {
     ? products
     : products.filter((product) => product.category === selectedCategory);
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "fish":
-        return <Fish className="h-4 w-4 text-blue-500" />;
-      case "inputs":
-        return <Fish className="h-4 w-4 text-green-500" />;
-      // case "investment":
-      //   return <DollarSign className="h-4 w-4 text-amber-500" />;
-      default:
-        return null;
+  const getCategoryIcon = (categorySlug: string) => {
+    // Try to match based on slug keywords if not exact match
+    if (categorySlug === "fish" || categorySlug.includes("fish")) {
+      return <Fish className="h-4 w-4 text-blue-500" />;
+    } else if (categorySlug === "inputs" || categorySlug === "nile-perch" || categorySlug.includes("perch")) {
+      return <Fish className="h-4 w-4 text-green-500" />;
+    } else if (categorySlug === "investment") {
+      return <DollarSign className="h-4 w-4 text-amber-500" />;
+    } else {
+       return <LeafyGreen className="h-4 w-4 text-gray-500" />;
     }
   };
 
@@ -324,33 +399,71 @@ const ProductList = () => {
               <Filter className="mr-2 h-4 w-4" />
               All Products
             </Button>
-            <Button
-              variant={selectedCategory === "fish" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory("fish")}
-              className={selectedCategory === "fish" ? "bg-blue-600" : ""}
-            >
-              <Fish className="mr-2 h-4 w-4" />
-              Fish
-            </Button>
-            <Button
-              variant={selectedCategory === "inputs" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory("inputs")}
-              className={selectedCategory === "inputs" ? "bg-green-600" : ""}
-            >
-              <LeafyGreen className="mr-2 h-4 w-4" />
-              Nile Perch
-            </Button>
-            {/* <Button
-              variant={selectedCategory === "investment" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory("investment")}
-              className={selectedCategory === "investment" ? "bg-amber-600" : ""}
-            >
-              <DollarSign className="mr-2 h-4 w-4" />
-              Investment
-            </Button> */}
+            
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                variant={selectedCategory === category.slug ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category.slug)}
+                className={selectedCategory === category.slug ? "bg-blue-600" : ""}
+              >
+                {getCategoryIcon(category.slug)}
+                <span className="ml-2">{category.name}</span>
+              </Button>
+            ))}
+
+            <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-green-600 text-white hover:bg-green-700 hover:text-white"
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add New Category
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Manage Categories</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="flex space-x-2">
+                    <Input 
+                      placeholder="New category name" 
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                    />
+                    <Button onClick={handleAddCategory} disabled={isAddingCategory}>
+                      {isAddingCategory ? <Spinner size="sm" /> : "Add"}
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-gray-500">Existing Categories</h4>
+                    {categories.length === 0 ? (
+                      <p className="text-sm text-gray-400">No categories found.</p>
+                    ) : (
+                      <div className="max-h-[200px] overflow-y-auto space-y-2">
+                        {categories.map((category) => (
+                          <div key={category.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                            <span>{category.name}</span>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleDeleteCategory(category.id)}
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {!productsLoaded && !refreshing ? (
@@ -412,11 +525,11 @@ const ProductList = () => {
                           <div className="flex items-center">
                             {getCategoryIcon(product.category)}
                             <span className="ml-2">
-                              {product.category === "fish"
-                                ? "Tilapia"
-                                : product.category === "inputs"
-                                ? "Nile Perch"
-                                : "Investment"}
+                              {/* Display category name from categories list if found, otherwise fallback to rough manual mapping or raw slug */}
+                              {categories.find(c => c.slug === product.category)?.name || 
+                               (product.category === "fish" ? "Fish" : 
+                                product.category === "inputs" ? "Nile Perch" : 
+                                product.category)}
                             </span>
                           </div>
                         </TableCell>
