@@ -12,17 +12,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { useContent } from "@/contexts/ContentContext";
 import { supabase } from "@/integrations/supabase/client"; 
 
-// Product categories with icons
-const categories = [
-  { id: "all", name: "All Products", icon: Filter },
-  { id: "fish", name: "Tilapia Fish", icon: Fish },
-  { id: "inputs", name: "Nile Perch", icon: Fish },
-  // { id: "investment", name: "Investment Opportunities", icon: DollarSign },
-];
+import { fetchCategoriesFromApi } from "@/services/categoryService"; 
+
 
 const Shop = () => {
   const { products, isLoading } = useProducts();
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [categories, setCategories] = useState<{ id: string; name: string; icon: any }[]>([
+    { id: "all", name: "All Products", icon: Filter }
+  ]);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const { content, isLoading: contentLoading } = useContent();
   const [adminPhoneNumber, setAdminPhoneNumber] = useState("+255755823336");
@@ -60,7 +58,36 @@ const Shop = () => {
     };
     
     fetchAdminPhone();
-  }, []); 
+
+    const loadCategories = async () => {
+      try {
+        const data = await fetchCategoriesFromApi();
+        
+        // Helper to determine icon
+        const getIcon = (slug: string) => {
+          if (slug === 'fish' || slug.includes('fish') || slug.includes('tilapia')) return Fish;
+          if (slug === 'inputs' || slug.includes('perch')) return LeafyGreen;
+          if (slug === 'investment') return DollarSign;
+          return LeafyGreen;
+        };
+
+        const mappedCategories = data.map(c => ({
+          id: c.slug, // Use slug as ID for filtering compatibility
+          name: c.name,
+          icon: getIcon(c.slug)
+        }));
+
+        setCategories([
+          { id: "all", name: "All Products", icon: Filter },
+          ...mappedCategories
+        ]);
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+      }
+    };
+    
+    loadCategories();
+  }, []);  
 
   // Filter products based on selected category
   const filteredProducts = selectedCategory === "all"
@@ -210,8 +237,10 @@ const Shop = () => {
                               product.category === 'fish' ? 'bg-blue-500' : 
                               product.category === 'inputs' ? 'bg-green-500' : 'bg-amber-500'
                             }`}></span>
-                            {product.category === 'fish' ? 'Tilapia Fish' : 
-                             product.category === 'inputs' ? 'Nile Perch' : 'Investment Opportunity'}
+                            {/* Display category name dynamically if possible, or fallback */}
+                            {categories.find(c => c.id === product.category)?.name || 
+                             (product.category === 'fish' ? 'Tilapia Fish' : 
+                              product.category === 'inputs' ? 'Nile Perch' : 'Investment Opportunity')}
                           </div>
                         </CardContent>
                         {/* ${product.whatsapp_message} */}
