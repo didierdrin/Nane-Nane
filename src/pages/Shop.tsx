@@ -63,18 +63,11 @@ const Shop = () => {
       try {
         const data = await fetchCategoriesFromApi();
         
-        // Helper to determine icon
-        const getIcon = (slug: string) => {
-          if (slug === 'fish' || slug.includes('fish') || slug.includes('tilapia')) return Fish;
-          if (slug === 'inputs' || slug.includes('perch')) return LeafyGreen;
-          if (slug === 'investment') return DollarSign;
-          return LeafyGreen;
-        };
-
+        // Map data but don't assign icons to dynamic categories as per user request
         const mappedCategories = data.map(c => ({
-          id: c.slug, // Use slug as ID for filtering compatibility
+          id: c.slug, 
           name: c.name,
-          icon: getIcon(c.slug)
+          icon: null // No icon for dynamic categories
         }));
 
         setCategories([
@@ -96,8 +89,7 @@ const Shop = () => {
 
   // Get the current category
   const currentCategory = categories.find(c => c.id === selectedCategory) || categories[0];
-  const CategoryIcon = currentCategory.icon;
-
+  const CategoryIcon = currentCategory.icon || Filter; // Fallback icon for header if needed, or handle null
 
   // Default fallback data
   const shopData = content?.shop || {
@@ -147,7 +139,7 @@ const Shop = () => {
                             }`}
                             onClick={() => setSelectedCategory(category.id)}
                           >
-                            <Icon size={18} className={selectedCategory === category.id ? 'text-nanenane-600' : 'text-gray-500'} />
+                            {Icon && <Icon size={18} className={selectedCategory === category.id ? 'text-nanenane-600' : 'text-gray-500'} />}
                             {category.name}
                           </button>
                         </li>
@@ -184,7 +176,7 @@ const Shop = () => {
                     <p className="text-gray-600">
                       {selectedCategory === "all" && "Browse all our aquaculture products and investment opportunities"}
                       {selectedCategory === "fish" && "Fresh fish products for vendors, traders, and fish farmers"}
-                      {selectedCategory === "inputs" && "Quality inputs and equipment for your fish farming operations"}
+                      {selectedCategory === "nile" && "Quality inputs and equipment for your fish farming operations"}
                       {/* {selectedCategory === "investment" && "Investment opportunities in our sustainable aquaculture business"} */}
                     </p>
                   </div>

@@ -83,7 +83,7 @@ const ProductFormBasicFields = ({
             ) : (
               <>
                 <SelectItem value="fish">Fish Products</SelectItem>
-                <SelectItem value="inputs">Nile Perch</SelectItem>
+                <SelectItem value="nile">Nile Perch</SelectItem>
               </>
             )}
           </SelectContent>

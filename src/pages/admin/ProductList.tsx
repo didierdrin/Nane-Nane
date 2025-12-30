@@ -297,7 +297,7 @@ const ProductList = () => {
     // Try to match based on slug keywords if not exact match
     if (categorySlug === "fish" || categorySlug.includes("fish")) {
       return <Fish className="h-4 w-4 text-blue-500" />;
-    } else if (categorySlug === "inputs" || categorySlug === "nile-perch" || categorySlug.includes("perch")) {
+    } else if (categorySlug === "nile" || categorySlug === "nile-perch" || categorySlug.includes("perch")) {
       return <Fish className="h-4 w-4 text-green-500" />;
     } else if (categorySlug === "investment") {
       return <DollarSign className="h-4 w-4 text-amber-500" />;
@@ -528,7 +528,7 @@ const ProductList = () => {
                               {/* Display category name from categories list if found, otherwise fallback to rough manual mapping or raw slug */}
                               {categories.find(c => c.slug === product.category)?.name || 
                                (product.category === "fish" ? "Fish" : 
-                                product.category === "inputs" ? "Nile Perch" : 
+                                product.category === "nile" ? "Nile Perch" : 
                                 product.category)}
                             </span>
                           </div>
