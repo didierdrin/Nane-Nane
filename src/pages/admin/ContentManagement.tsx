@@ -153,6 +153,15 @@ const defaultContent = {
     description: "A Tanzanian-led, tech-enabled fish company solving protein deficiency and post-harvest loss across East Africa.",
     address: "Kongolo, Mwanza, Tanzania",
     phone: "+255 755 823 336"
+  },
+  admin: {
+    header: {
+      title: "Nane Nane Admin Portal",
+      subtitle: "Manage your tech-enabled fish farming business - products, inventory, and operations."
+    },
+    footer: {
+      text: "Nane Nane Fish Farm Admin Portal"
+    }
   }
 };
 
@@ -357,13 +366,14 @@ const ContentManagement = () => {
           </Alert>
         )}
 
-        <Tabs defaultValue="footer" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">            
+        <Tabs defaultValue="shop" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-6">            
             <TabsTrigger value="shop">Shop</TabsTrigger>
             <TabsTrigger value="about">About</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
             <TabsTrigger value="explore">Explore</TabsTrigger>
             <TabsTrigger value="footer">Footer</TabsTrigger>
+            <TabsTrigger value="admin">Admin</TabsTrigger>
           </TabsList>
 
          
@@ -1118,6 +1128,55 @@ const ContentManagement = () => {
             </Card>
           </TabsContent>
 
+          {/* Admin Content */}
+          <TabsContent value="admin" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>Admin Portal Content</CardTitle>
+                    <CardDescription>Update admin portal header and footer text</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => resetSectionToDefaults('admin')}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Reset Section
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <h3 className="text-lg font-semibold">Header Section</h3>
+                <div>
+                  <Label htmlFor="admin-header-title">Portal Title</Label>
+                  <Input
+                    id="admin-header-title"
+                    value={content.admin?.header?.title || defaultContent.admin.header.title}
+                    onChange={(e) => updateField('admin.header.title', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="admin-header-subtitle">Portal Subtitle</Label>
+                  <Textarea
+                    id="admin-header-subtitle"
+                    value={content.admin?.header?.subtitle || defaultContent.admin.header.subtitle}
+                    onChange={(e) => updateField('admin.header.subtitle', e.target.value)}
+                    rows={2}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <h3 className="text-lg font-semibold">Footer Section</h3>
+                <div>
+                  <Label htmlFor="admin-footer-text">Footer Text</Label>
+                  <Input
+                    id="admin-footer-text"
+                    value={content.admin?.footer?.text || defaultContent.admin.footer.text}
+                    onChange={(e) => updateField('admin.footer.text', e.target.value)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
         </Tabs>
       </div>
