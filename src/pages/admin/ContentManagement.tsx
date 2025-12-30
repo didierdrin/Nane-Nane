@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { AlertCircle, Save, RefreshCw } from 'lucide-react';
+import { AlertCircle, Save, RefreshCw, Upload } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import AdminLayout from '@/components/admin/AdminLayout';
 
@@ -239,6 +239,37 @@ const ContentManagement = () => {
     });
   };
 
+  const handleImageUpload = async (file: File, index: number) => {
+    if (!file) return;
+
+    try {
+      setSaving(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `content/about-${index}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(fileName);
+
+      updateArrayField('about.images', index, 'url', publicUrl);
+      setMessage({ type: 'success', text: 'Image uploaded successfully!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setMessage({ type: 'error', text: 'Failed to upload image' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <AdminLayout>
@@ -463,11 +494,37 @@ const ContentManagement = () => {
                         <div className="font-medium text-sm text-gray-500">Image {index + 1}</div>
                         <div>
                           <Label>Image URL</Label>
-                          <Input 
-                            value={image.url} 
-                            onChange={(e) => updateArrayField('about.images', index, 'url', e.target.value)}
-                            placeholder="https://..."
-                          />
+                          <div className="flex gap-2">
+                            <Input 
+                              value={image.url} 
+                              onChange={(e) => updateArrayField('about.images', index, 'url', e.target.value)}
+                              placeholder="https://..."
+                              className="flex-1"
+                            />
+                            <div className="relative">
+                              <Input
+                                type="file"
+                                id={`image-upload-${index}`}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleImageUpload(file, index);
+                                }}
+                                disabled={saving}
+                              />
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="icon"
+                                onClick={() => document.getElementById(`image-upload-${index}`)?.click()}
+                                disabled={saving}
+                                title="Upload from device"
+                              >
+                                <Upload className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                         <div>
                           <Label>Alt Text</Label>
@@ -480,6 +537,7 @@ const ContentManagement = () => {
                       </div>
                     ))}
                   </div>
+
                 </div>
               </CardContent>
             </Card>
