@@ -25,7 +25,7 @@ const Footer = () => {
   return (
     <footer className="bg-nanenane-900 text-white">
       <div className="container-custom pt-16 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {/* Company Info */}
           <div className="md:col-span-2">
             <h2 className="text-2xl font-bold mb-4">
