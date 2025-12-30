@@ -25,9 +25,9 @@ const Footer = () => {
   return (
     <footer className="bg-nanenane-900 text-white">
       <div className="container-custom pt-16 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info  gap-8 */}
-          <div className="md:col-span-[70px]">
+          <div className="md:col-span-2">
             <h2 className="text-2xl font-bold mb-4">
               NANE<span className="text-lake-400">NANE</span>
             </h2>
@@ -47,41 +47,44 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li><Link to="/explore" className="text-gray-300 hover:text-white transition-colors">Home</Link></li>
-              <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Shop</Link></li>
-              <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link></li>
-            </ul>
-          </div>
+          {/* Nested Grid for Quick Links, Services, and Contact Info */}
+          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Quick Links */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                <li><Link to="/explore" className="text-gray-300 hover:text-white transition-colors">Home</Link></li>
+                <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Shop</Link></li>
+                <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link></li>
+              </ul>
+            </div>
 
-          {/* Services */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Our Services</h3>
-            <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Fish Farming</Link></li>
-              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Cold-Chain Aggregation</Link></li>
-              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Value-Added Processing</Link></li>
-              <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Smart Distribution</Link></li>
-            </ul>
-          </div>
+            {/* Services */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Our Services</h3>
+              <ul className="space-y-2">
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Fish Farming</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Cold-Chain Aggregation</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Value-Added Processing</Link></li>
+                <li><Link to="/" className="text-gray-300 hover:text-white transition-colors">Smart Distribution</Link></li>
+              </ul>
+            </div>
 
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start">
-                <MapPin size={18} className="mr-2 mt-1 flex-shrink-0" />
-                <span className="text-gray-300">{footerData.address}</span>
-              </li>
-              <li className="flex items-center">
-                <Phone size={18} className="mr-2 flex-shrink-0" />
-                <span className="text-gray-300">{footerData.phone}</span>
-              </li>
-            </ul>
+            {/* Contact Info */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <MapPin size={18} className="mr-2 mt-1 flex-shrink-0" />
+                  <span className="text-gray-300">{footerData.address}</span>
+                </li>
+                <li className="flex items-center">
+                  <Phone size={18} className="mr-2 flex-shrink-0" />
+                  <span className="text-gray-300">{footerData.phone}</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
